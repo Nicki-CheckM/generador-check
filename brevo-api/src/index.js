@@ -15,16 +15,30 @@ addEventListener('fetch', event => {
   }
   async function handleRequest(request, env) {
    // Inicializar la API key desde el parámetro env
-   BREVO_API_KEY = env.BREVO_API_KEY;
+   const BREVO_API_KEY = env && env.BREVO_API_KEY;
   
-   // Manejar preflight CORS
+
    if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: corsHeaders()
     });
   }
-
+ // Manejar solicitudes GET (cuando alguien visita la URL directamente)
+ if (request.method === 'GET') {
+    return new Response(JSON.stringify({
+      status: 'online',
+      apiKeyConfigured: !!BREVO_API_KEY,
+      message: 'API de envío de correos. Esta API solo acepta solicitudes POST.',
+      timestamp: new Date().toISOString()
+    }), {
+      status: 200,
+      headers: {
+        ...corsHeaders(),
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   // Solo procesar solicitudes POST
   if (request.method !== 'POST') {
     return new Response('Método no permitido', {
@@ -35,6 +49,19 @@ addEventListener('fetch', event => {
       }
     });
   }
+    // Verificar si la API key está configurada
+	if (!BREVO_API_KEY) {
+		return new Response(JSON.stringify({
+		  success: false,
+		  message: 'Error de configuración: La API key de Brevo no está configurada en el Worker'
+		}), {
+		  status: 500,
+		  headers: {
+			...corsHeaders(),
+			'Content-Type': 'application/json'
+		  }
+		});
+	  }
   
 	try {
 	  // Obtener datos de la solicitud
