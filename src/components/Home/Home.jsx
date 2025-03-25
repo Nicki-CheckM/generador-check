@@ -12,35 +12,51 @@ const Home = () => {
         mb: 4,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center', // Centra horizontalmente los elementos
-        minHeight: '100vh',   // Usa toda la altura de la ventana
-        justifyContent: 'flex-start' // Alinea desde arriba
+        alignItems: 'center',
+        minHeight: '100vh',
+        justifyContent: 'flex-start',
+        px: 3 // Añadido padding horizontal para mejor espaciado en móviles
       }}
     >
-      <Typography variant="h3" component="h1" align="center" gutterBottom>
+      <Typography 
+        variant="h3" 
+        component="h1" 
+        align="center" 
+        gutterBottom
+        sx={{ fontWeight: 'bold', mb: 2 }} // Mejorado el estilo del título
+      >
         Check Medicine - Sistema de Certificados
       </Typography>
-      <Divider sx={{ mb: 4, width: '100%' }} />
+      <Divider sx={{ mb: 5, width: '100%' }} /> {/* Aumentado el margen inferior */}
       
       <Grid 
         container 
-        spacing={4} 
+        spacing={6} // Aumentado el espaciado entre contenedores
         justifyContent="center" 
         alignItems="stretch"
-        sx={{ maxWidth: '100%' }} // Limita el ancho máximo
+        sx={{ width: '100%', mx: 'auto' }} // Centrado horizontal mejorado
       >
         {/* Contenedor para el Generador de Certificados */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 3, 
-              height: '600px', // Reducido de 800px a 600px
+              p: 4, // Aumentado el padding interno
+              height: '650px', // Ajustado la altura
+              width: '100%', // Asegura que ocupe todo el ancho disponible
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              borderRadius: 2, // Bordes más redondeados
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)' // Sombra más suave y elegante
             }}
           >
-            <Typography variant="h4" component="h2" align="center" gutterBottom>
+            <Typography 
+              variant="h4" 
+              component="h2" 
+              align="center" 
+              gutterBottom
+              sx={{ fontWeight: 'medium', mb: 3 }} // Mejorado el estilo
+            >
               Generador de Certificados
             </Typography>
             <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
@@ -50,17 +66,26 @@ const Home = () => {
         </Grid>
         
         {/* Contenedor para el Envío de Correos */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper 
             elevation={3} 
             sx={{ 
-              p: 3, 
-              height: '600px', // Reducido de 800px a 600px
+              p: 4, // Aumentado el padding interno
+              height: '650px', // Ajustado la altura
+              width: '100%', // Asegura que ocupe todo el ancho disponible
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              borderRadius: 2, // Bordes más redondeados
+              boxShadow: '0 4px 20px rgba(0,0,0,0.1)' // Sombra más suave y elegante
             }}
           >
-            <Typography variant="h4" component="h2" align="center" gutterBottom>
+            <Typography 
+              variant="h4" 
+              component="h2" 
+              align="center" 
+              gutterBottom
+              sx={{ fontWeight: 'medium', mb: 3 }} // Mejorado el estilo
+            >
               Envío de Correos
             </Typography>
             <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
