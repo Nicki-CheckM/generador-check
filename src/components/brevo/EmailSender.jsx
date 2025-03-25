@@ -90,7 +90,7 @@ const EmailSender = () => {
     console.log('Contenido HTML:', htmlContent);
     
     // Intentamos enviar directamente sin verificación previa
-    const response = await fetch('https://brevo-api.certificatemedicine.workers.dev/', {
+    const response = await fetch('https://brevo-api.certificatemedicine.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
