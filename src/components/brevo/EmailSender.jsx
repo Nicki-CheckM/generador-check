@@ -138,9 +138,7 @@ const EmailSender = () => {
   return (
     <Container maxWidth="md" className="email-container" sx={{ height: '100%', p: 0 }}>
       <Paper elevation={3} className="email-paper" sx={{ m: 0 }}>
-        <Typography variant="h5" component="h1" gutterBottom align="center">
-          Envío Masivo de Correos
-        </Typography>
+
   
         <Box className="email-content">
           <Box mb={2}>
