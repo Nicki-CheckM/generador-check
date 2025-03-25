@@ -27,7 +27,7 @@ const Home = () => {
         spacing={4} 
         justifyContent="center" 
         alignItems="stretch"
-        sx={{ maxWidth: '1200px' }} // Limita el ancho máximo
+        sx={{ maxWidth: '100%' }} // Limita el ancho máximo
       >
         {/* Contenedor para el Generador de Certificados */}
         <Grid item xs={12} md={6}>
