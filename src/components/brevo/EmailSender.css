@@ -1,0 +1,42 @@
+.email-wrapper {
+  height: 100%;
+}
+
+.email-editor {
+  height: 150px !important;
+  overflow: auto !important;
+  padding: 5px !important;
+}
+
+.rdw-editor-toolbar {
+  padding: 2px !important;
+  margin-bottom: 0 !important;
+}
+
+.rdw-option-wrapper {
+  padding: 3px !important;
+  min-width: 25px !important;
+  height: 25px !important;
+}
+
+/* Nuevos estilos para ajustar el contenedor */
+.email-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.email-paper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  height: 450px;
+  overflow: hidden;
+}
+
+
+.email-content {
+  flex: 1;
+  overflow-y: auto;
+}

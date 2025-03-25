@@ -1,0 +1,11 @@
+name = "brevo-api"
+main = "src/index.js"
+compatibility_date = "2023-05-18"
+
+# Usar workers.dev en lugar de un dominio personalizado
+workers_dev = true
+
+
+# Habilitar logs para depuración
+[build.upload]
+format = "service-worker"
