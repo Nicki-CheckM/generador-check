@@ -16,7 +16,7 @@ function corsHeaders() {
 async function handleRequest(request) {
   // Acceder a la API key como secreto
   // En Cloudflare Workers, los secretos se acceden directamente desde el objeto global
-  const BREVO_API_KEY = BREVO_API_KEY || ''; // Acceso directo al secreto
+  const API_KEY = BREVO_API_KEY || '';// Acceso directo al secreto
 
   // Manejar preflight CORS
   if (request.method === 'OPTIONS') {
@@ -29,7 +29,7 @@ async function handleRequest(request) {
   if (request.method === 'GET') {
     return new Response(JSON.stringify({
       status: 'online',
-      apiKeyConfigured: !!BREVO_API_KEY,
+      apiKeyConfigured: !!API_KEY,
       message: 'API de envío de correos. Esta API solo acepta solicitudes POST.',
       timestamp: new Date().toISOString()
     }), {
@@ -51,7 +51,7 @@ async function handleRequest(request) {
     });
   }
   // Verificar si la API key está configurada
-  if (!BREVO_API_KEY) {
+  if (!API_KEY) {
     return new Response(JSON.stringify({
       success: false,
       message: 'Error de configuración: La API key de Brevo no está configurada en el Worker'
@@ -202,7 +202,7 @@ async function handleRequest(request) {
 		method: 'POST',
 		headers: {
 		  'Content-Type': 'application/json',
-		  'api-key': BREVO_API_KEY
+		  'api-key': API_KEY
 		},
 		body: JSON.stringify(emailData)
 	  });
@@ -249,7 +249,7 @@ async function handleRequest(request) {
 	  }
   
 	  // Verificar API key y mostrarla parcialmente para depuración
-	  if (!BREVO_API_KEY) {
+	  if (!API_KEY) {
 		return new Response(JSON.stringify({ 
 		  error: 'API Key no configurada',
 		  message: 'La variable de entorno BREVO_API_KEY no está configurada en el Worker'
@@ -263,7 +263,7 @@ async function handleRequest(request) {
 	  }
 	  
 	  // Mostrar los primeros 5 caracteres de la API key para verificar que está cargada
-	  const apiKeyPreview = BREVO_API_KEY ? `${BREVO_API_KEY.substring(0, 5)}...` : 'No disponible';
+	  const apiKeyPreview = API_KEY ? `${API_KEY.substring(0, 5)}...` : 'No disponible';
   
 	  // Resultados del envío con información detallada
 	  const results = {
@@ -307,7 +307,7 @@ async function handleRequest(request) {
 			method: 'POST',
 			headers: {
 			  'Content-Type': 'application/json',
-			  'api-key': BREVO_API_KEY
+			  'api-key': API_KEY
 			},
 			body: JSON.stringify(emailData)
 		  });
@@ -361,7 +361,7 @@ async function handleRequest(request) {
 		const accountResponse = await fetch('https://api.sendinblue.com/v3/account', {
 		  method: 'GET',
 		  headers: {
-			'api-key': BREVO_API_KEY
+			'api-key': API_KEY
 		  }
 		});
 		
