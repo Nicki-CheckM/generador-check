@@ -84,7 +84,7 @@ async function handleRequest(request) {
       }
   
       // Enviar correo usando la API de Brevo
-      const response = await fetch('https://api.sendinblue.com/v3/smtp/email', {
+      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ async function handleRequest(request) {
           }
   
           // Enviar correo usando la API de Brevo
-          const response = await fetch('https://api.sendinblue.com/v3/smtp/email', {
+          const response = await fetch('https://api.brevo.com/v3/smtp/email', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

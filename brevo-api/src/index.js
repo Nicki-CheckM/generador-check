@@ -1,6 +1,6 @@
 // Implementación para Cloudflare Workers
 addEventListener('fetch', event => {
-	event.respondWith(handleRequest(event.request))
+	event.respondWith(handleRequest(event.request, event.env))
   })
   
 // Helper function for CORS headers
@@ -13,10 +13,10 @@ function corsHeaders() {
 	};
   }
 
-async function handleRequest(request) {
+async function handleRequest(request, env) {
   // Acceder a la API key como secreto
   // En Cloudflare Workers, los secretos se acceden directamente desde el objeto global
-  const API_KEY = BREVO_API_KEY || '';// Acceso directo al secreto
+  const API_KEY = env.BREVO_API_KEY || '';
 
   // Manejar preflight CORS
   if (request.method === 'OPTIONS') {
@@ -27,12 +27,13 @@ async function handleRequest(request) {
   }
   // Manejar solicitudes GET (cuando alguien visita la URL directamente)
   if (request.method === 'GET') {
-    return new Response(JSON.stringify({
-      status: 'online',
-      apiKeyConfigured: !!API_KEY,
-      message: 'API de envío de correos. Esta API solo acepta solicitudes POST.',
-      timestamp: new Date().toISOString()
-    }), {
+	return new Response(JSON.stringify({
+	  status: 'online',
+	  apiKeyConfigured: !!API_KEY,
+	  apiKeyLength: API_KEY ? API_KEY.length : 0, // Añadir esto temporalmente para depuración
+	  message: 'API de envío de correos. Esta API solo acepta solicitudes POST.',
+	  timestamp: new Date().toISOString()
+	}), {
       status: 200,
       headers: {
         ...corsHeaders(),
@@ -159,7 +160,7 @@ async function handleRequest(request) {
   }
   
   // Función para enviar un correo individual
-  async function handleSendEmail(request, corsHeaders) {
+  async function handleSendEmail(request, corsHeaders, env) {
 	try {
 		if (request.method !== 'POST') {
 		  return new Response('Method Not Allowed', { 
@@ -198,11 +199,11 @@ async function handleRequest(request) {
 	  }
   
 	  // Enviar correo usando la API de Brevo
-	  const response = await fetch('https://api.sendinblue.com/v3/smtp/email', {
+	  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
 		method: 'POST',
 		headers: {
 		  'Content-Type': 'application/json',
-		  'api-key': API_KEY
+		  'api-key': env.BREVO_API_KEY
 		},
 		body: JSON.stringify(emailData)
 	  });
@@ -227,7 +228,7 @@ async function handleRequest(request) {
   }
   
   // Función para enviar correos masivos
-  async function handleSendBulkEmails(request) {
+  async function handleSendBulkEmails(request, env) {
 	try {
 	  if (request.method !== 'POST') {
 		return new Response('Method Not Allowed', { 
@@ -249,7 +250,8 @@ async function handleRequest(request) {
 	  }
   
 	  // Verificar API key y mostrarla parcialmente para depuración
-	  if (!API_KEY) {
+	  const API_KEY = env.BREVO_API_KEY || '';
+    if (!API_KEY) {
 		return new Response(JSON.stringify({ 
 		  error: 'API Key no configurada',
 		  message: 'La variable de entorno BREVO_API_KEY no está configurada en el Worker'
@@ -303,7 +305,7 @@ async function handleRequest(request) {
 		  console.log(`Intentando enviar correo a: ${email}`);
 		  
 		  // Enviar correo usando la API de Brevo
-		  const response = await fetch('https://api.sendinblue.com/v3/smtp/email', {
+		  const response = await fetch('https://api.brevo.com/v3/smtp/email', {
 			method: 'POST',
 			headers: {
 			  'Content-Type': 'application/json',
@@ -358,7 +360,7 @@ async function handleRequest(request) {
   
 	  // Verificar con la API de Brevo el estado de la cuenta
 	  try {
-		const accountResponse = await fetch('https://api.sendinblue.com/v3/account', {
+		const accountResponse = await fetch('https://api.brevo.com/v3/account', {
 		  method: 'GET',
 		  headers: {
 			'api-key': API_KEY
