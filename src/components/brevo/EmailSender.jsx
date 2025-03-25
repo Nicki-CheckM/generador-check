@@ -89,13 +89,34 @@ const EmailSender = () => {
     console.log('Asunto:', subject);
     console.log('Contenido HTML:', htmlContent);
     
-    // Usamos directamente el modo no-cors ya que sabemos que el otro enfoque falla
+    // Primero verificamos si la API key está configurada
+    try {
+      const checkResponse = await fetch('https://brevo-api.certificatemedicine.workers.dev/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (checkResponse.ok) {
+        const statusData = await checkResponse.json();
+        console.log('Estado del servidor:', statusData);
+        
+        if (!statusData.apiKeyConfigured) {
+          throw new Error('La API key de Brevo no está configurada en el Worker. Por favor, configura la variable de entorno BREVO_API_KEY en tu Worker de Cloudflare.');
+        }
+      }
+    } catch (checkError) {
+      console.error('Error al verificar el estado del servidor:', checkError);
+      throw checkError;
+    }
+    
+    // Si llegamos aquí, la API key está configurada, procedemos con el envío
     const response = await fetch('https://brevo-api.certificatemedicine.workers.dev/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      mode: 'no-cors', // Usar no-cors directamente
       body: JSON.stringify({
         emails,
         subject,
@@ -103,20 +124,19 @@ const EmailSender = () => {
       })
     });
     
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error del servidor: ${response.status} - ${errorText || 'Sin detalles'}`);
+    }
     
-    // Como estamos usando no-cors, no podemos acceder al contenido de la respuesta
-    // Así que mostraremos un mensaje genérico de éxito
+    const data = await response.json();
+    console.log('Respuesta del servidor:', data);
+    
     setResult({
-      successful: emails.length,
-      failed: 0,
-      message: 'Solicitud enviada. Los correos deberían estar en proceso de envío.'
+      successful: data.successful || emails.length,
+      failed: data.failed || 0,
+      message: data.message || 'Correos enviados correctamente'
     });
-    
-    // Opcional: Verificar si los correos se enviaron después de un tiempo
-    setTimeout(() => {
-      // Aquí podrías implementar una verificación adicional si tienes un endpoint para ello
-      console.log('Verificación de envío: Los correos deberían haber sido procesados por el servidor.');
-    }, 5000);
   } catch (error) {
     console.error('Error completo:', error);
     setError('Error al enviar los correos: ' + error.message);
