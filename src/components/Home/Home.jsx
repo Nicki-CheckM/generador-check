@@ -6,7 +6,7 @@ import EmailSender from '../brevo/EmailSender';
 const Home = () => {
   return (
     <Container 
-      maxWidth="lg" 
+      maxWidth="100%" 
       sx={{ 
         mt: 4, 
         mb: 4,
@@ -14,7 +14,7 @@ const Home = () => {
         flexDirection: 'column',
         alignItems: 'center',
         minHeight: '100vh',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         px: 3 // Añadido padding horizontal para mejor espaciado en móviles
       }}
     >
