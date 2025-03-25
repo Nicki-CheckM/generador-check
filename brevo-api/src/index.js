@@ -40,46 +40,66 @@ export default {
 		// Configurar la solicitud a la API de Brevo
 		const brevoApiKey = env.BREVO_API_KEY;
 		
-		// Preparar los datos para la API de Brevo
-		const brevoData = {
-		  sender: {
-			name: "Certificate Medicine",
-			email: "contacto@checkmedicinemo.com"
-		  },
-		  to: emails.map(email => ({ email })),
-		  subject: subject,
-		  htmlContent: htmlContent
-		};
+		// Modificación: Enviar correos individuales a cada destinatario
+		let successCount = 0;
+		let failCount = 0;
+		let errors = [];
   
-		// Enviar la solicitud a la API de Brevo
-		const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-		  method: "POST",
-		  headers: {
-			"Content-Type": "application/json",
-			"api-key": brevoApiKey
-		  },
-		  body: JSON.stringify(brevoData)
-		});
+		// Enviar correos uno por uno
+		for (const email of emails) {
+		  // Preparar los datos para la API de Brevo (un solo destinatario)
+		  const brevoData = {
+			sender: {
+			  name: "CheckMedicine",
+			  email: "contacto@checkmedicinemo.com"
+			},
+			to: [{ email }], // Solo un destinatario por correo
+			subject: subject,
+			htmlContent: htmlContent,
+			// Añadir cabeceras para mejorar la entrega
+			headers: {
+			  "List-Unsubscribe": "<mailto:contacto@checkmedicinemo.com?subject=unsubscribe>"
+			},
+			// Opcional: configurar responder a
+			replyTo: {
+			  email: "contacto@checkmedicinemo.com",
+			  name: "CheckMedicine"
+			}
+		  };
   
-		// Procesar la respuesta de Brevo
-		if (!brevoResponse.ok) {
-		  const errorData = await brevoResponse.json();
-		  console.error("Error de Brevo:", errorData);
-		  return new Response(
-			JSON.stringify({ 
-			  message: "Error al enviar los correos", 
-			  error: errorData 
-			}),
-			{ status: brevoResponse.status, headers: corsHeaders() }
-		  );
+		  try {
+			// Enviar la solicitud a la API de Brevo
+			const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+			  method: "POST",
+			  headers: {
+				"Content-Type": "application/json",
+				"api-key": brevoApiKey
+			  },
+			  body: JSON.stringify(brevoData)
+			});
+  
+			if (brevoResponse.ok) {
+			  successCount++;
+			} else {
+			  const errorData = await brevoResponse.json();
+			  failCount++;
+			  errors.push({ email, error: errorData });
+			  console.error(`Error al enviar a ${email}:`, errorData);
+			}
+		  } catch (emailError) {
+			failCount++;
+			errors.push({ email, error: emailError.message });
+			console.error(`Error al enviar a ${email}:`, emailError);
+		  }
 		}
   
-		// Respuesta exitosa
+		// Respuesta con resultados
 		return new Response(
 		  JSON.stringify({
-			message: "Correos enviados correctamente",
-			successful: emails.length,
-			failed: 0
+			message: "Proceso de envío completado",
+			successful: successCount,
+			failed: failCount,
+			errors: errors.length > 0 ? errors : undefined
 		  }),
 		  { status: 200, headers: corsHeaders() }
 		);
