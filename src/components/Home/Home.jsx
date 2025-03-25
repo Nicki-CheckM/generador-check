@@ -37,7 +37,7 @@ const Home = () => {
         sx={{ width: '100%', mx: 'auto' }} // Centrado horizontal mejorado
       >
         {/* Contenedor para el Generador de Certificados */}
-        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper 
             elevation={3} 
             sx={{ 
@@ -66,7 +66,7 @@ const Home = () => {
         </Grid>
         
         {/* Contenedor para el Envío de Correos */}
-        <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid item xs={6}  sx={{ display: 'flex', justifyContent: 'center' }}>
           <Paper 
             elevation={3} 
             sx={{ 
