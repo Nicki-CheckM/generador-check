@@ -89,29 +89,7 @@ const EmailSender = () => {
     console.log('Asunto:', subject);
     console.log('Contenido HTML:', htmlContent);
     
-    // Primero verificamos si la API key está configurada
-    try {
-      const checkResponse = await fetch('https://brevo-api.certificatemedicine.workers.dev/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (checkResponse.ok) {
-        const statusData = await checkResponse.json();
-        console.log('Estado del servidor:', statusData);
-        
-        if (!statusData.apiKeyConfigured) {
-          throw new Error('La API key de Brevo no está configurada en el Worker. Por favor, configura la variable de entorno BREVO_API_KEY en tu Worker de Cloudflare.');
-        }
-      }
-    } catch (checkError) {
-      console.error('Error al verificar el estado del servidor:', checkError);
-      throw checkError;
-    }
-    
-    // Si llegamos aquí, la API key está configurada, procedemos con el envío
+    // Intentamos enviar directamente sin verificación previa
     const response = await fetch('https://brevo-api.certificatemedicine.workers.dev/', {
       method: 'POST',
       headers: {
@@ -124,12 +102,20 @@ const EmailSender = () => {
       })
     });
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error del servidor: ${response.status} - ${errorText || 'Sin detalles'}`);
+    // Intentamos obtener la respuesta JSON
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      // Si no podemos parsear JSON, usamos el texto
+      const text = await response.text();
+      throw new Error(`Error en la respuesta: ${text}`);
     }
     
-    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || `Error del servidor: ${response.status}`);
+    }
+    
     console.log('Respuesta del servidor:', data);
     
     setResult({

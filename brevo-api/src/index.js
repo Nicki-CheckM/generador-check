@@ -1,11 +1,10 @@
 // Implementación para Cloudflare Workers
 addEventListener('fetch', event => {
-	event.respondWith(handleRequest(event.request, event.env))
+	event.respondWith(handleRequest(event.request))
   })
   
-  // Configuración de Brevo API
-  let BREVO_API_KEY; // Declaramos la variable pero la inicializamos en handleRequest
-  function corsHeaders() {
+// Helper function for CORS headers
+function corsHeaders() {
 	return {
 	  'Access-Control-Allow-Origin': '*',
 	  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -13,19 +12,21 @@ addEventListener('fetch', event => {
 	  'Access-Control-Max-Age': '86400'
 	};
   }
-  async function handleRequest(request, env) {
-   // Inicializar la API key desde el parámetro env
-   const BREVO_API_KEY = env && env.BREVO_API_KEY;
-  
 
-   if (request.method === 'OPTIONS') {
+async function handleRequest(request) {
+  // Acceder a la API key como secreto
+  // En Cloudflare Workers, los secretos se acceden directamente desde el objeto global
+  const BREVO_API_KEY = BREVO_API_KEY || ''; // Acceso directo al secreto
+
+  // Manejar preflight CORS
+  if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
       headers: corsHeaders()
     });
   }
- // Manejar solicitudes GET (cuando alguien visita la URL directamente)
- if (request.method === 'GET') {
+  // Manejar solicitudes GET (cuando alguien visita la URL directamente)
+  if (request.method === 'GET') {
     return new Response(JSON.stringify({
       status: 'online',
       apiKeyConfigured: !!BREVO_API_KEY,
@@ -49,19 +50,19 @@ addEventListener('fetch', event => {
       }
     });
   }
-    // Verificar si la API key está configurada
-	if (!BREVO_API_KEY) {
-		return new Response(JSON.stringify({
-		  success: false,
-		  message: 'Error de configuración: La API key de Brevo no está configurada en el Worker'
-		}), {
-		  status: 500,
-		  headers: {
-			...corsHeaders(),
-			'Content-Type': 'application/json'
-		  }
-		});
-	  }
+  // Verificar si la API key está configurada
+  if (!BREVO_API_KEY) {
+    return new Response(JSON.stringify({
+      success: false,
+      message: 'Error de configuración: La API key de Brevo no está configurada en el Worker'
+    }), {
+      status: 500,
+      headers: {
+        ...corsHeaders(),
+        'Content-Type': 'application/json'
+      }
+    });
+  }
   
 	try {
 	  // Obtener datos de la solicitud
