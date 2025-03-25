@@ -102,21 +102,25 @@ const EmailSender = () => {
       })
     });
     
+    // Log the raw response for debugging
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries([...response.headers]));
+    
     // Intentamos obtener la respuesta JSON
     let data;
     try {
       data = await response.json();
+      console.log('Response data:', data);
     } catch (e) {
       // Si no podemos parsear JSON, usamos el texto
       const text = await response.text();
+      console.error('Failed to parse JSON response:', text);
       throw new Error(`Error en la respuesta: ${text}`);
     }
     
     if (!response.ok) {
       throw new Error(data.message || `Error del servidor: ${response.status}`);
     }
-    
-    console.log('Respuesta del servidor:', data);
     
     setResult({
       successful: data.successful || emails.length,
