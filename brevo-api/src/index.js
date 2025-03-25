@@ -1,6 +1,7 @@
 // Implementación para Cloudflare Workers
 addEventListener('fetch', event => {
-	event.respondWith(handleRequest(event.request, event.env))
+	// Pass env to handleRequest
+	event.respondWith(handleRequest(event.request, event))
   })
   
 // Helper function for CORS headers
@@ -13,10 +14,12 @@ function corsHeaders() {
 	};
   }
 
-async function handleRequest(request, env) {
-  // Acceder a la API key como secreto
-  // En Cloudflare Workers, los secretos se acceden directamente desde el objeto global
-  const API_KEY = env.BREVO_API_KEY || '';
+  async function handleRequest(request, event) {
+	// Access the API key safely, checking if env exists
+	const API_KEY = event?.env?.BREVO_API_KEY || '';
+	
+	// Log for debugging
+	console.log('API Key configured:', !!API_KEY);
 
   // Manejar preflight CORS
   if (request.method === 'OPTIONS') {
