@@ -1,18 +1,9 @@
 name = "brevo-api"
 main = "src/index.js"
-compatibility_date = "2023-05-18"
+compatibility_date = "2023-09-04"
 
-# Usar workers.dev en lugar de un dominio personalizado
-workers_dev = true
-
-# Habilitar logs para depuración
-[build.upload]
-format = "service-worker"
-
-# Add secret binding
 [vars]
-# This is just a placeholder, the actual value will come from your secret
-BREVO_API_KEY = ""
+# Variables públicas aquí (si las necesitas)
 
-[[secrets]]
-name = "BREVO_API_KEY"
+# Las variables secretas se configuran con el comando wrangler
+# wrangler secret put BREVO_API_KEY
