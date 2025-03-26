@@ -262,11 +262,7 @@ const Certificate = ({ data }) => {
             <View style={styles.footerImages}>
               <View style={styles.signatureContainer}>
                 <Image style={styles.signatureImage} src={firmaImage} />
-                <Text style={styles.signatureName}>
-                NICOLETTE FRANCOIS{'\n'}
-                AHUMADA ALVEAR{'\n'}
-                CEO Check Medicine Mode On
-                </Text>
+             
               </View>
               <View style={styles.sealContainer}>
                 <Image style={styles.sealImage} src={selloImage} />
