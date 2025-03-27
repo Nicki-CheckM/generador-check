@@ -18,10 +18,28 @@ const EmailSender = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   // Manejar la carga del archivo Excel
   useEffect(() => {
-    const tokens = localStorage.getItem('googleDriveTokens');
-    if (tokens) {
-      setIsAuthenticated(true);
-    }
+    const checkAuth = () => {
+      const tokens = localStorage.getItem('googleDriveTokens');
+      setIsAuthenticated(!!tokens);
+    };
+    
+    // Verificar al inicio
+    checkAuth();
+    
+    // Configurar un listener para cambios en localStorage
+    const handleStorageChange = () => {
+      checkAuth();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // También verificar cada segundo por si acaso
+    const interval = setInterval(checkAuth, 1000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -71,6 +89,13 @@ const EmailSender = () => {
  // Enviar correos masivos
  const handleSendEmails = async () => {
   
+
+   // Verificar autenticación nuevamente justo antes de enviar
+   const tokens = localStorage.getItem('googleDriveTokens');
+   if (!tokens) {
+     setError('Debes autenticarte con Google Drive primero');
+     return;
+   }
   if (!isAuthenticated) {
     setError('Debes autenticarte con Google Drive primero');
     return;
