@@ -23,6 +23,8 @@ const EmailSender = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [userEmail, setUserEmail] = useState('');
+  const [isAuthorizedUser, setIsAuthorizedUser] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -35,9 +37,33 @@ const EmailSender = () => {
       const tokens = localStorage.getItem('googleDriveTokens');
       setIsAuthenticated(!!tokens);
       
-      // Verificar si hay autenticación de admin guardada
-      const adminAuth = localStorage.getItem('adminAuthenticated');
-      setIsAdminAuthenticated(adminAuth === 'true');
+      // Si hay tokens, intentar obtener el correo del usuario
+      if (tokens) {
+        try {
+          const parsedTokens = JSON.parse(tokens);
+          // El ID token contiene información del usuario en formato JWT
+          if (parsedTokens.id_token) {
+            // Decodificar el JWT para obtener la información del usuario
+            const base64Url = parsedTokens.id_token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            
+            const payload = JSON.parse(jsonPayload);
+            const email = payload.email;
+            
+            setUserEmail(email || '');
+            // Verificar si es el usuario autorizado
+            setIsAuthorizedUser(email === 'nicoletteahumada1997@gmail.com');
+          }
+        } catch (error) {
+          console.error('Error al obtener información del usuario:', error);
+        }
+      } else {
+        setUserEmail('');
+        setIsAuthorizedUser(false);
+      }
     };
     
     checkAuth();
@@ -127,16 +153,16 @@ const EmailSender = () => {
      setError('Debes autenticarte con Google Drive primero');
      return;
    }
-  if (!isAuthenticated) {
+   if (!isAuthenticated) {
     setError('Debes autenticarte con Google Drive primero');
     return;
   }
-    // Verificar autenticación de admin
-    if (!isAdminAuthenticated) {
-      setError('Necesitas credenciales de administrador para enviar correos');
-      setShowLoginDialog(true);
-      return;
-    }
+  
+  // Verificar si es el usuario autorizado
+  if (!isAuthorizedUser) {
+    setError('No tienes autorización para enviar correos. Solo el administrador puede hacerlo.');
+    return;
+  }
 
   if (!emails.length) {
     setError('No hay correos electrónicos para enviar.');
@@ -217,29 +243,14 @@ const EmailSender = () => {
         <Box className="email-content">
                 {/* Mostrar estado de autenticación de admin */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-            {isAdminAuthenticated ? (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Alert severity="success" sx={{ py: 0, mr: 1 }}>
-                  <Typography variant="body2">Admin autenticado</Typography>
-                </Alert>
-                <Button 
-                  variant="outlined" 
-                  color="error" 
-                  size="small" 
-                  onClick={handleAdminLogout}
-                >
-                  Cerrar sesión
-                </Button>
-              </Box>
-            ) : (
-              <Button 
-                variant="outlined" 
-                color="primary" 
-                size="small" 
-                onClick={() => setShowLoginDialog(true)}
-              >
-                Iniciar sesión como admin
-              </Button>
+            {isAuthenticated && (
+              <Alert severity={isAuthorizedUser ? "success" : "warning"} sx={{ py: 0, mr: 1 }}>
+                <Typography variant="body2">
+                  {isAuthorizedUser 
+                    ? `Usuario autorizado: ${userEmail}` 
+                    : `Usuario sin autorización: ${userEmail}`}
+                </Typography>
+              </Alert>
             )}
           </Box>
           <Box mb={2}>
@@ -317,37 +328,37 @@ const EmailSender = () => {
               </Typography>
             </Alert>
           )}
-             {!isAuthenticated && (
-          <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
-            <Typography variant="body2">
-              Debes iniciar sesión con Google Drive para enviar correos.
-            </Typography>
-          </Alert>
-        )}
-        {!isAdminAuthenticated && (
+                  {!isAuthenticated && (
             <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
               <Typography variant="body2">
-                Necesitas credenciales de administrador para enviar correos.
+                Debes iniciar sesión con Google Drive para enviar correos.
+              </Typography>
+            </Alert>
+          )}
+          
+          {isAuthenticated && !isAuthorizedUser && (
+            <Alert severity="error" sx={{ mb: 1, py: 0 }}>
+              <Typography variant="body2">
+                Solo el administrador (nicoletteahumada1997@gmail.com) puede enviar correos.
               </Typography>
             </Alert>
           )}
         </Box>
   
-        
         <Button
           variant="contained"
           color="primary"
           fullWidth
           size="medium"
           onClick={handleSendEmails}
-          disabled={loading || !emails.length || !isAuthenticated || !isAdminAuthenticated}
+          disabled={loading || !emails.length || !isAuthenticated || !isAuthorizedUser}
           sx={{ 
             mt: 1,
-            opacity: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 0.7 : 1,
-            cursor: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 'not-allowed' : 'pointer'
+            opacity: (loading || !emails.length || !isAuthenticated || !isAuthorizedUser) ? 0.7 : 1,
+            cursor: (loading || !emails.length || !isAuthenticated || !isAuthorizedUser) ? 'not-allowed' : 'pointer'
           }}
         >
-        {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
+          {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
         </Button>
       </Paper>
             {/* Diálogo de inicio de sesión de admin */}
