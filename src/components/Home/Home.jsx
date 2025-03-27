@@ -50,15 +50,7 @@ const Home = () => {
               boxShadow: '0 4px 20px rgba(0,0,0,0.1)' // Sombra más suave y elegante
             }}
           >
-            <Typography 
-              variant="h4" 
-              component="h2" 
-              align="center" 
-              gutterBottom
-              sx={{ fontWeight: 'medium', mb: 3 }} // Mejorado el estilo
-            >
-              Generador de Certificados
-            </Typography>
+            
             <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'auto' }}>
               <CertificateGenerator />
             </Box>
