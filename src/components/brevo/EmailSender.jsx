@@ -16,24 +16,29 @@ const EmailSender = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [loginUser, setLoginUser] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
   // Manejar la carga del archivo Excel
   useEffect(() => {
     const checkAuth = () => {
       const tokens = localStorage.getItem('googleDriveTokens');
       setIsAuthenticated(!!tokens);
+      
+      // Verificar si hay autenticación de admin guardada
+      const adminAuth = localStorage.getItem('adminAuthenticated');
+      setIsAdminAuthenticated(adminAuth === 'true');
     };
     
-    // Verificar al inicio
     checkAuth();
     
-    // Configurar un listener para cambios en localStorage
     const handleStorageChange = () => {
       checkAuth();
     };
     
     window.addEventListener('storage', handleStorageChange);
-    
-    // También verificar cada segundo por si acaso
     const interval = setInterval(checkAuth, 1000);
     
     return () => {
@@ -41,6 +46,24 @@ const EmailSender = () => {
       clearInterval(interval);
     };
   }, []);
+    // Función para manejar el inicio de sesión de admin
+    const handleAdminLogin = () => {
+      if (loginUser === ADMIN_USER && loginPassword === ADMIN_PASSWORD) {
+        setIsAdminAuthenticated(true);
+        localStorage.setItem('adminAuthenticated', 'true');
+        setShowLoginDialog(false);
+        setLoginError('');
+        setLoginUser('');
+        setLoginPassword('');
+      } else {
+        setLoginError('Usuario o contraseña incorrectos');
+      }
+    };
+      // Función para cerrar sesión de admin
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    localStorage.removeItem('adminAuthenticated');
+  };
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     setFile(file);
@@ -100,6 +123,12 @@ const EmailSender = () => {
     setError('Debes autenticarte con Google Drive primero');
     return;
   }
+    // Verificar autenticación de admin
+    if (!isAdminAuthenticated) {
+      setError('Necesitas credenciales de administrador para enviar correos');
+      setShowLoginDialog(true);
+      return;
+    }
 
   if (!emails.length) {
     setError('No hay correos electrónicos para enviar.');
@@ -178,6 +207,33 @@ const EmailSender = () => {
 
   
         <Box className="email-content">
+                {/* Mostrar estado de autenticación de admin */}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            {isAdminAuthenticated ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Alert severity="success" sx={{ py: 0, mr: 1 }}>
+                  <Typography variant="body2">Admin autenticado</Typography>
+                </Alert>
+                <Button 
+                  variant="outlined" 
+                  color="error" 
+                  size="small" 
+                  onClick={handleAdminLogout}
+                >
+                  Cerrar sesión
+                </Button>
+              </Box>
+            ) : (
+              <Button 
+                variant="outlined" 
+                color="primary" 
+                size="small" 
+                onClick={() => setShowLoginDialog(true)}
+              >
+                Iniciar sesión como admin
+              </Button>
+            )}
+          </Box>
           <Box mb={2}>
             <Typography variant="h6" gutterBottom fontSize="1rem">
               1. Sube un archivo Excel con correos electrónicos
@@ -260,25 +316,68 @@ const EmailSender = () => {
             </Typography>
           </Alert>
         )}
+        {!isAdminAuthenticated && (
+            <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
+              <Typography variant="body2">
+                Necesitas credenciales de administrador para enviar correos.
+              </Typography>
+            </Alert>
+          )}
         </Box>
   
         
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        size="medium"
-        onClick={handleSendEmails}
-        disabled={loading || !emails.length || !isAuthenticated}
-        sx={{ 
-          mt: 1,
-          opacity: (loading || !emails.length || !isAuthenticated) ? 0.7 : 1,
-          cursor: (loading || !emails.length || !isAuthenticated) ? 'not-allowed' : 'pointer'
-        }}
-      >
-         {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          size="medium"
+          onClick={handleSendEmails}
+          disabled={loading || !emails.length || !isAuthenticated || !isAdminAuthenticated}
+          sx={{ 
+            mt: 1,
+            opacity: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 0.7 : 1,
+            cursor: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 'not-allowed' : 'pointer'
+          }}
+        >
+        {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
         </Button>
       </Paper>
+            {/* Diálogo de inicio de sesión de admin */}
+            <Dialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)}>
+        <DialogTitle>Iniciar sesión como administrador</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Usuario"
+              type="email"
+              fullWidth
+              variant="outlined"
+              value={loginUser}
+              onChange={(e) => setLoginUser(e.target.value)}
+            />
+            <TextField
+              margin="dense"
+              label="Contraseña"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+            />
+            {loginError && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {loginError}
+              </Alert>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowLoginDialog(false)}>Cancelar</Button>
+          <Button onClick={handleAdminLogin} variant="contained">Iniciar sesión</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 
