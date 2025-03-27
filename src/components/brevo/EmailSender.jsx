@@ -8,8 +8,8 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './EmailSender.css';
 
 // Obtener credenciales de variables de entorno
-const ADMIN_USER = process.env.REACT_APP_ADMIN_USER || "";
-const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || "";
+const ADMIN_USER = env.REACT_APP_ADMIN_USER || "";
+const ADMIN_PASSWORD = env.REACT_APP_ADMIN_PASSWORD || "";
 
 
 
