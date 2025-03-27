@@ -7,9 +7,9 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './EmailSender.css';
 
-// Credenciales de acceso (en producción deberían estar en variables de entorno)
-const ADMIN_USER = "nicoletteahumada1997@gmail.com";
-const ADMIN_PASSWORD = "Check#Medicine2025";
+// Obtener credenciales de variables de entorno
+const ADMIN_USER = process.env.REACT_APP_ADMIN_USER || "";
+const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || "";
 
 
 
