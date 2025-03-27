@@ -10,7 +10,10 @@ import './EmailSender.css';
 const ADMIN_USER = process.env.REACT_APP_ADMIN_USER || "";
 const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || "";
 
-
+console.log("Variables de entorno:", {
+  ADMIN_USER: process.env.REACT_APP_ADMIN_USER,
+  ADMIN_PASSWORD: process.env.REACT_APP_ADMIN_PASSWORD
+});
 
 const EmailSender = () => {
   const [file, setFile] = useState(null);
