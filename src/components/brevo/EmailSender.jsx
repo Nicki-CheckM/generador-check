@@ -15,8 +15,14 @@ const EmailSender = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   // Manejar la carga del archivo Excel
+  useEffect(() => {
+    const tokens = localStorage.getItem('googleDriveTokens');
+    if (tokens) {
+      setIsAuthenticated(true);
+    }
+  }, []);
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     setFile(file);
@@ -64,6 +70,12 @@ const EmailSender = () => {
 
  // Enviar correos masivos
  const handleSendEmails = async () => {
+  
+  if (!isAuthenticated) {
+    setError('Debes autenticarte con Google Drive primero');
+    return;
+  }
+
   if (!emails.length) {
     setError('No hay correos electrónicos para enviar.');
     return;
@@ -216,18 +228,30 @@ const EmailSender = () => {
               </Typography>
             </Alert>
           )}
+             {!isAuthenticated && (
+          <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
+            <Typography variant="body2">
+              Debes iniciar sesión con Google Drive para enviar correos.
+            </Typography>
+          </Alert>
+        )}
         </Box>
   
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          size="medium"
-          onClick={handleSendEmails}
-          disabled={loading || !emails.length}
-          sx={{ mt: 1 }}
-        >
-          {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
+        
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        size="medium"
+        onClick={handleSendEmails}
+        disabled={loading || !emails.length || !isAuthenticated}
+        sx={{ 
+          mt: 1,
+          opacity: (loading || !emails.length || !isAuthenticated) ? 0.7 : 1,
+          cursor: (loading || !emails.length || !isAuthenticated) ? 'not-allowed' : 'pointer'
+        }}
+      >
+         {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
         </Button>
       </Paper>
     </Container>
