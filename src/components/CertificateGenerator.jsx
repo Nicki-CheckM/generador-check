@@ -117,6 +117,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: '0 20px',
   },
+  signatureContainer4:{  flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+
+  },
   signatureContainer: {
     flex: 1,
     alignItems: 'center',
@@ -260,7 +265,7 @@ const Certificate = ({ data }) => {
         </View>
           <View style={styles.footer}>
             <View style={styles.footerImages}>
-              <View style={styles.signatureContainer}>
+              <View style={styles.signatureContainer4}>
                 <Image style={styles.signatureImage} src={firmaImage} />
              
               </View>
