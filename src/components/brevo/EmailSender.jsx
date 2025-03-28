@@ -41,21 +41,36 @@ const EmailSender = () => {
       if (tokens) {
         try {
           const parsedTokens = JSON.parse(tokens);
+          console.log("Tokens obtenidos:", parsedTokens);
+          
           // El ID token contiene información del usuario en formato JWT
           if (parsedTokens.id_token) {
-            // Decodificar el JWT para obtener la información del usuario
-            const base64Url = parsedTokens.id_token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            
-            const payload = JSON.parse(jsonPayload);
-            const email = payload.email;
-            
-            setUserEmail(email || '');
-            // Verificar si es el usuario autorizado
-            setIsAuthorizedUser(email === 'nicoletteahumada1997@gmail.com');
+            try {
+              // Decodificar el JWT para obtener la información del usuario
+              const base64Url = parsedTokens.id_token.split('.')[1];
+              const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+              const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+              }).join(''));
+              
+              const payload = JSON.parse(jsonPayload);
+              console.log("Información del usuario decodificada:", payload);
+              
+              // Google puede usar 'email' o 'sub' para el correo
+              const email = payload.email || '';
+              
+              console.log("Correo detectado:", email);
+              setUserEmail(email);
+              
+              // Verificar si es el usuario autorizado (comparación insensible a mayúsculas/minúsculas)
+              const isAuthorized = email.toLowerCase() === 'nicoletteahumada1997@gmail.com'.toLowerCase();
+              console.log("¿Es usuario autorizado?", isAuthorized);
+              setIsAuthorizedUser(isAuthorized);
+            } catch (decodeError) {
+              console.error("Error al decodificar el token:", decodeError);
+            }
+          } else {
+            console.log("No se encontró id_token en los tokens guardados");
           }
         } catch (error) {
           console.error('Error al obtener información del usuario:', error);
