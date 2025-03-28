@@ -242,17 +242,7 @@ const EmailSender = () => {
   
         <Box className="email-content">
                 {/* Mostrar estado de autenticación de admin */}
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-            {isAuthenticated && (
-              <Alert severity={isAuthorizedUser ? "success" : "warning"} sx={{ py: 0, mr: 1 }}>
-                <Typography variant="body2">
-                  {isAuthorizedUser 
-                    ? `Usuario autorizado: ${userEmail}` 
-                    : `Usuario sin autorización: ${userEmail}`}
-                </Typography>
-              </Alert>
-            )}
-          </Box>
+              
           <Box mb={2}>
             <Typography variant="h6" gutterBottom fontSize="1rem">
               1. Sube un archivo Excel con correos electrónicos
