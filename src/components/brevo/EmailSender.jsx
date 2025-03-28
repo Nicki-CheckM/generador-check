@@ -7,13 +7,11 @@ import draftToHtml from 'draftjs-to-html';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './EmailSender.css';
 
-const ADMIN_USER = process.env.REACT_APP_ADMIN_USER || "";
-const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || "";
+// Credenciales de acceso (en producción deberían estar en variables de entorno)
+const ADMIN_USER = "nicoletteahumada1997@gmail.com";
+const ADMIN_PASSWORD = "Check#Medicine2025";
 
-console.log("Variables de entorno:", {
-  ADMIN_USER: process.env.REACT_APP_ADMIN_USER,
-  ADMIN_PASSWORD: process.env.REACT_APP_ADMIN_PASSWORD
-});
+
 
 const EmailSender = () => {
   const [file, setFile] = useState(null);
@@ -23,8 +21,6 @@ const EmailSender = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [userEmail, setUserEmail] = useState('');
-  const [isAuthorizedUser, setIsAuthorizedUser] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -37,33 +33,9 @@ const EmailSender = () => {
       const tokens = localStorage.getItem('googleDriveTokens');
       setIsAuthenticated(!!tokens);
       
-      // Si hay tokens, intentar obtener el correo del usuario
-      if (tokens) {
-        try {
-          const parsedTokens = JSON.parse(tokens);
-          console.log("Tokens obtenidos:", parsedTokens);
-          
-          // Como no tenemos id_token, vamos a usar el access_token para obtener la información del usuario
-          if (parsedTokens.access_token) {
-            // Establecer el correo autorizado directamente
-            // Ya que estamos autenticados con Google Drive, podemos confiar en que el usuario es el correcto
-            setUserEmail('nicoletteahumada1997@gmail.com');
-            setIsAuthorizedUser(true);
-            console.log("Usuario autorizado manualmente debido a la autenticación exitosa con Google Drive");
-          } else {
-            console.log("No se encontró access_token en los tokens guardados");
-            setUserEmail('');
-            setIsAuthorizedUser(false);
-          }
-        } catch (error) {
-          console.error('Error al obtener información del usuario:', error);
-          setUserEmail('');
-          setIsAuthorizedUser(false);
-        }
-      } else {
-        setUserEmail('');
-        setIsAuthorizedUser(false);
-      }
+      // Verificar si hay autenticación de admin guardada
+      const adminAuth = localStorage.getItem('adminAuthenticated');
+      setIsAdminAuthenticated(adminAuth === 'true');
     };
     
     checkAuth();
@@ -153,16 +125,16 @@ const EmailSender = () => {
      setError('Debes autenticarte con Google Drive primero');
      return;
    }
-   if (!isAuthenticated) {
+  if (!isAuthenticated) {
     setError('Debes autenticarte con Google Drive primero');
     return;
   }
-  
-  // Verificar si es el usuario autorizado
-  if (!isAuthorizedUser) {
-    setError('No tienes autorización para enviar correos. Solo el administrador puede hacerlo.');
-    return;
-  }
+    // Verificar autenticación de admin
+    if (!isAdminAuthenticated) {
+      setError('Necesitas credenciales de administrador para enviar correos');
+      setShowLoginDialog(true);
+      return;
+    }
 
   if (!emails.length) {
     setError('No hay correos electrónicos para enviar.');
@@ -242,7 +214,32 @@ const EmailSender = () => {
   
         <Box className="email-content">
                 {/* Mostrar estado de autenticación de admin */}
-              
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+            {isAdminAuthenticated ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Alert severity="success" sx={{ py: 0, mr: 1 }}>
+                  <Typography variant="body2">Admin autenticado</Typography>
+                </Alert>
+                <Button 
+                  variant="outlined" 
+                  color="error" 
+                  size="small" 
+                  onClick={handleAdminLogout}
+                >
+                  Cerrar sesión
+                </Button>
+              </Box>
+            ) : (
+              <Button 
+                variant="outlined" 
+                color="primary" 
+                size="small" 
+                onClick={() => setShowLoginDialog(true)}
+              >
+                Iniciar sesión como admin
+              </Button>
+            )}
+          </Box>
           <Box mb={2}>
             <Typography variant="h6" gutterBottom fontSize="1rem">
               1. Sube un archivo Excel con correos electrónicos
@@ -318,37 +315,37 @@ const EmailSender = () => {
               </Typography>
             </Alert>
           )}
-                  {!isAuthenticated && (
+             {!isAuthenticated && (
+          <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
+            <Typography variant="body2">
+              Debes iniciar sesión con Google Drive para enviar correos.
+            </Typography>
+          </Alert>
+        )}
+        {!isAdminAuthenticated && (
             <Alert severity="warning" sx={{ mb: 1, py: 0 }}>
               <Typography variant="body2">
-                Debes iniciar sesión con Google Drive para enviar correos.
-              </Typography>
-            </Alert>
-          )}
-          
-          {isAuthenticated && !isAuthorizedUser && (
-            <Alert severity="error" sx={{ mb: 1, py: 0 }}>
-              <Typography variant="body2">
-                Solo el administrador (nicoletteahumada1997@gmail.com) puede enviar correos.
+                Necesitas credenciales de administrador para enviar correos.
               </Typography>
             </Alert>
           )}
         </Box>
   
+        
         <Button
           variant="contained"
           color="primary"
           fullWidth
           size="medium"
           onClick={handleSendEmails}
-          disabled={loading || !emails.length || !isAuthenticated || !isAuthorizedUser}
+          disabled={loading || !emails.length || !isAuthenticated || !isAdminAuthenticated}
           sx={{ 
             mt: 1,
-            opacity: (loading || !emails.length || !isAuthenticated || !isAuthorizedUser) ? 0.7 : 1,
-            cursor: (loading || !emails.length || !isAuthenticated || !isAuthorizedUser) ? 'not-allowed' : 'pointer'
+            opacity: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 0.7 : 1,
+            cursor: (loading || !emails.length || !isAuthenticated || !isAdminAuthenticated) ? 'not-allowed' : 'pointer'
           }}
         >
-          {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
+        {loading ? <CircularProgress size={20} color="inherit" /> : 'Enviar Correos'}
         </Button>
       </Paper>
             {/* Diálogo de inicio de sesión de admin */}
