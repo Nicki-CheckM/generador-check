@@ -8,7 +8,7 @@ import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import './EmailSender.css';
 
 // Credenciales de acceso (en producción deberían estar en variables de entorno)
-const ADMIN_USER = "nicoletteahumada1997@gmail.com";
+const ADMIN_USER = "administracion@checkmedicinemo.com";
 const ADMIN_PASSWORD = "Check#Medicine2025";
 
 
