@@ -544,15 +544,17 @@ const generateCertificates = async () => {
 
   try {
     // ID de la carpeta principal donde quieres guardar los certificados
-    const mainFolderId = '1FU4bmvetv8La3TUtTD6PHlHpfT3Wu_p0';
+    const mainFolderId = '1zsair15nFgTqRrV8vy96a17InevDH2SK';
     
     // Crear una subcarpeta con la fecha actual
     const today = new Date();
-    const folderName = today.toLocaleDateString('es-ES', {
+    const courseName = excelData && excelData.length > 0 ? 
+    excelData[0].nombreCurso.replace(/[^a-z0-9]/gi, '_').substring(0, 30) : '';
+    const folderName = `${today.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    }).replace(/\//g, '-');
+    }).replace(/\//g, '-')}_${courseName}`;
     
     let dateFolderId;
     try {

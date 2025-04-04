@@ -45,7 +45,7 @@ export default {
     // Intentar diferentes nombres de variables
     const CLIENT_ID = env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID || env.CLIENT_ID;
     const CLIENT_SECRET = env.REACT_APP_GOOGLE_OAUTH_CLIENT_SECRET || env.CLIENT_SECRET;
-    const REDIRECT_URI = 'https://check-certificado.vercel.app/oauth2callback';
+    const REDIRECT_URI = 'https://checkmedicinemo-ceritificados.cl/oauth2callback';
     const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 
     // Añadir endpoint de status para depuración
