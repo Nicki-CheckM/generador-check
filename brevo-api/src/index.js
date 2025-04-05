@@ -45,6 +45,8 @@ export default {
 		let failCount = 0;
 		let errors = [];
   
+		// Función para esperar un tiempo determinado (en ms)
+		const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 		// Enviar correos uno por uno
 		for (const email of emails) {
 		  // Preparar los datos para la API de Brevo (un solo destinatario)
@@ -70,46 +72,51 @@ export default {
 		  try {
 			// Enviar la solicitud a la API de Brevo
 			const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
-			  method: "POST",
-			  headers: {
-				"Content-Type": "application/json",
-				"api-key": brevoApiKey
-			  },
-			  body: JSON.stringify(brevoData)
-			});
-  
-			if (brevoResponse.ok) {
-			  successCount++;
-			} else {
-			  const errorData = await brevoResponse.json();
+				method: "POST",
+				headers: {
+				  "Content-Type": "application/json",
+				  "api-key": brevoApiKey
+				},
+				body: JSON.stringify(brevoData)
+			  });
+	
+			  if (brevoResponse.ok) {
+				successCount++;
+			  } else {
+				const errorData = await brevoResponse.json();
+				failCount++;
+				errors.push({ email, error: errorData });
+				console.error(`Error al enviar a ${email}:`, errorData);
+			  }
+			  
+			  // Añadir un retraso de 300ms entre cada envío para evitar límites de tasa
+			  await delay(300);
+			  
+			} catch (emailError) {
 			  failCount++;
-			  errors.push({ email, error: errorData });
-			  console.error(`Error al enviar a ${email}:`, errorData);
+			  errors.push({ email, error: emailError.message });
+			  console.error(`Error al enviar a ${email}:`, emailError);
 			}
-		  } catch (emailError) {
-			failCount++;
-			errors.push({ email, error: emailError.message });
-			console.error(`Error al enviar a ${email}:`, emailError);
 		  }
-		}
   
-		// Respuesta con resultados
-		return new Response(
-		  JSON.stringify({
-			message: "Proceso de envío completado",
-			successful: successCount,
-			failed: failCount,
-			errors: errors.length > 0 ? errors : undefined
-		  }),
-		  { status: 200, headers: corsHeaders() }
-		);
-	  } catch (error) {
-		console.error("Error en el worker:", error);
-		return new Response(
-		  JSON.stringify({ message: "Error interno del servidor", error: error.message }),
-		  { status: 500, headers: corsHeaders() }
-		);
-	  }
+
+	      // Respuesta con resultados
+		  return new Response(
+			JSON.stringify({
+			  message: "Proceso de envío completado",
+			  successful: successCount,
+			  failed: failCount,
+			  errors: errors.length > 0 ? errors : undefined
+			}),
+			{ status: 200, headers: corsHeaders() }
+		  );
+		} catch (error) {
+		  console.error("Error en el worker:", error);
+		  return new Response(
+			JSON.stringify({ message: "Error interno del servidor", error: error.message }),
+			{ status: 500, headers: corsHeaders() }
+		  );
+		}
 	}
   };
   
