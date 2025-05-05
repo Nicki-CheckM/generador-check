@@ -248,10 +248,10 @@ const Certificate = ({ data }) => {
             <Text style={styles.rut}>Rut: {data.rut}</Text>
           </View>
 
-        <View style={styles.content}>
+                <View style={styles.content}>
           <Text>
           Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
-          aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, la 3ra Jornada "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
+          aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
           organizado por Check Medicine Mode On, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
           pedagógicas, realizado desde el <Text style={styles.dynamicData}>{data.fechaInicio}</Text> al <Text style={styles.dynamicData}>{data.fechaFin}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
           </Text>
@@ -317,7 +317,8 @@ const sampleData = {
   rut: "12.345.678-9",
   asistencia: "100",
   nota: "6.5",
-  jornada: "3ra Jornada",
+  jornada: "40",
+  tipo_jornada: "3ra Jornada", // Añadimos el campo tipo_jornada
   nombreCurso: "Abordaje Inicial: Medicina de Urgencias y Paciente Crítico",
   horas: "50",
   fechaInicio: "01/01/2024",
@@ -383,6 +384,7 @@ const handleGoogleAuth = async () => {
           asistencia: normalizedItem['asistencia'] || 0,
           nota: normalizedItem['nota'] || '',
           jornada: normalizedItem['jornada'] || '',
+          tipo_jornada: normalizedItem['tipo_jornada'] || '', // Añadimos el campo tipo_jornada con valor por defecto
           nombreCurso: normalizedItem['nombrecurso'] || '',
           horas: normalizedItem['horas'] || '',
           año: normalizedItem['año'] || new Date().getFullYear().toString(),
