@@ -335,7 +335,7 @@ const Certificate2 = ({ data }) => {
           </View>
 
           <View style={styles.footerContent}>
-            <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>{"\n"}
+            <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>{"\n"}{"\n"}{"\n"}
           </View>
 
           <View style={styles.footer}>
