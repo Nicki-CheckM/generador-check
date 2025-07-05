@@ -319,14 +319,14 @@ const Certificate2 = ({ data }) => {
           <View style={styles.titleContainer}>
             <Text style={styles.mainTitle}>CERTIFICADO DE PARTICIPACIÓN</Text>
             <Text style={styles.certTitle}>Certificamos que:</Text>
-            <Text style={styles.name2}>{data.nombre}</Text>
+            <Text style={styles.name}>{data.nombre}</Text>
             <Text style={styles.rut}>Rut: {data.rut}</Text>
           </View>
 
           <View style={styles.content}>
             <Text>
               Ha participado en calidad de asistente en el taller:{'\n'}
-              "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
+              "<Text style={styles.name2}>{data.nombreCurso}</Text>",{'\n'}
               Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{'\n'}
               Este taller fue organizado por Check Medicine Mode On, contribuyendo{'\n'}
               así al fortalecimiento de sus conocimientos y competencias en la{'\n'}
