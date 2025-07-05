@@ -80,6 +80,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '300', // Font weight 300 como solicitado
   },
+  name2: {
+    fontSize: 30, // 30px como solicitado
+  marginTop: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
   name: {
     fontSize: 30, // 30px como solicitado
   
@@ -312,7 +319,7 @@ const Certificate2 = ({ data }) => {
           <View style={styles.titleContainer}>
             <Text style={styles.mainTitle}>CERTIFICADO DE PARTICIPACIÓN</Text>
             <Text style={styles.certTitle}>Certificamos que:</Text>
-            <Text style={styles.name}>{data.nombre}</Text>
+            <Text style={styles.name2}>{data.nombre}</Text>
             <Text style={styles.rut}>Rut: {data.rut}</Text>
           </View>
 
