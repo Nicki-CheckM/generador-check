@@ -82,10 +82,10 @@ const styles = StyleSheet.create({
   },
   name2: {
     fontSize: 30, // 30px como solicitado
-  marginTop: 10,
+  marginTop: 5,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   name: {
     fontSize: 30, // 30px como solicitado
@@ -1277,4 +1277,5 @@ const generateCertificates = async () => {
       </div>
     );
 };
+
 export default CertificateGenerator;
