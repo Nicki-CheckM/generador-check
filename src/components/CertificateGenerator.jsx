@@ -327,7 +327,7 @@ const Certificate2 = ({ data }) => {
             <Text>
               Ha participado en calidad de asistente en el taller:{"\n"}
               "<Text style={styles.name2}>{data.nombreCurso}</Text>",{"\n"}{"\n"}
-              Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{"\n"}{"\n"}
+              Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{"\n"}
               Este taller fue organizado por Check Medicine Mode On, contribuyendo{"\n"}
               así al fortalecimiento de sus conocimientos y competencias en la{"\n"}
               temática abordada.
@@ -335,7 +335,7 @@ const Certificate2 = ({ data }) => {
           </View>
 
           <View style={styles.footerContent}>
-            <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>
+            <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>{"\n"}
           </View>
 
           <View style={styles.footer}>
