@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 5,
   },
   certTitle: {
     fontSize: 20, // 20px como solicitado
