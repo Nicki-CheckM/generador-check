@@ -322,10 +322,10 @@ const Certificate2 = ({ data }) => {
               "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{' '}\n
               Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{' '}\n
               Este taller fue organizado por Check Medicine Mode On, contribuyendo{' '}\n
-              asi al fortalecimiento de sus conocimientos y competencias en la{' '}\n
-              tematica abordada.{' '}\n
-              Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}{' '}\n</Text>
-             </Text>
+              así al fortalecimiento de sus conocimientos y competencias en la{' '}\n
+              temática abordada.{' '}\n
+              Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>
+            </Text>
           </View>
   
           <View style={styles.footer}>
