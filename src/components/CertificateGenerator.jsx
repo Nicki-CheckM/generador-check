@@ -291,8 +291,200 @@ const Certificate = ({ data }) => {
     </Document>
   );
 };
+// Nuevo componente Certificate2 para certificados de participación
+const Certificate2 = ({ data }) => {
+  return (
+    <Document>
+      <Page size={[792, 612]} style={styles.page}>
+        {/* Imagen de fondo - manejo de imagen para "@react-pdf/renderer" */}
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
+          <Image src={fondoPdf} style={{ width: '100%', height: '100%' }} />
+        </View>
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          padding: 25,
+        }}>
+          
+          <View style={styles.titleContainer}>
+            <Text style={styles.mainTitle}>CERTIFICADO DE PARTICIPACIÓN</Text>
+            <Text style={styles.certTitle}>Certificamos que:</Text>
+            <Text style={styles.name}>{data.nombre}</Text>
+            <Text style={styles.rut}>Rut: {data.rut}</Text>
+          </View>
 
+          <View style={styles.content}>
+            <Text>
+              Ha participado en calidad de asistente en el taller:{' '}\n
+              "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{' '}\n
+              Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{' '}\n
+              Este taller fue organizado por Check Medicine Mode On, contribuyendo{' '}\n
+              asi al fortalecimiento de sus conocimientos y competencias en la{' '}\n
+              tematica abordada.{' '}\n
+              Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}{' '}\n</Text>
+             </Text>
+          </View>
+  
+          <View style={styles.footer}>
+            <View style={styles.footerImages}>
+              <View style={styles.signatureContainer4}>
+                <Image style={styles.signatureImage} src={firmaImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
+                <Image style={styles.sealImage} src={selloImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
+                <Image style={styles.certificateImage} src={certificadoImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
+                {data.qrCodeUrl && (
+                  <View style={styles.qrContainer}>
+                    <Image src={data.qrCodeUrl} style={styles.qrImage} />
+                    <Text style={styles.qrText}>Verificar certificado</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+      </Page>
+    </Document>
+  );
+};
+// Nueva función para generar certificados de participación
+const generateParticipationCertificates = async () => {
+  if (!excelData || excelData.length === 0) {
+    alert('No hay datos para generar certificados');
+    return;
+  }
 
+  setIsGenerating(true);
+  setProgress(0);
+  
+  console.log('Iniciando generación de certificados de participación con datos:', excelData);
+  const zip = new JSZip();
+  const totalItems = excelData.length;
+  
+  const updatedExcelData = excelData.map(item => {
+    const { rutSin, clave } = procesarRut(item.rut);
+    return {
+      ...item,
+      'rut sin': rutSin,
+      'clave': clave
+    };
+  });
+
+  try {
+    const mainFolderId = '1zsair15nFgTqRrV8vy96a17InevDH2SK';
+    
+    const today = new Date();
+    const courseName = excelData && excelData.length > 0 ? 
+    excelData[0].nombreCurso.replace(/[^a-z0-9]/gi, '_').substring(0, 30) : '';
+    const folderName = `${today.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(/\//g, '-')}_${courseName}_PARTICIPACION`;
+    
+    let dateFolderId;
+    try {
+      dateFolderId = await createFolderInDrive(folderName, mainFolderId);
+      if (!dateFolderId) {
+        throw new Error('No se pudo crear la carpeta en Drive. Verifica que estés usando la cuenta correcta con los permisos adecuados.');
+      }
+    } catch (folderError) {
+      alert(`Error: ${folderError.message}`);
+      setIsGenerating(false);
+      return;
+    }
+    
+    const targetFolderId = dateFolderId;
+    console.log('Carpeta creada en Drive con ID:', targetFolderId);
+    
+    for (let i = 0; i < excelData.length; i++) {
+      const data = excelData[i];
+      console.log('Generando certificado de participación para:', data);
+      
+      const timestamp = new Date().getTime() + i;
+      const safeCourseName = data.nombreCurso.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const safeName = data.nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const finalFileName = `certificado_participacion_${safeCourseName}_${safeName}_${timestamp}.pdf`;
+      
+      try {
+        const placeholderBlob = new Blob(['Placeholder'], { type: 'text/plain' });
+        const placeholderResult = await uploadFileToDrive(placeholderBlob, finalFileName, targetFolderId);
+        
+        if (!placeholderResult || !placeholderResult.url || !placeholderResult.fileId) {
+          throw new Error(`No se pudo crear el placeholder para ${data.nombre}`);
+        }
+        
+        const finalUrl = placeholderResult.url;
+        const finalFileId = placeholderResult.fileId;
+        
+        updatedExcelData[i] = {
+          ...updatedExcelData[i],
+          url_pdf: finalUrl
+        };
+
+        const qrCodeUrl = await generateQRCode(finalUrl);
+        const updatedData = { ...data, qrCodeUrl };
+        
+        // Usar Certificate2 en lugar de Certificate
+        const finalPdfBlob = await pdf(<Certificate2 data={updatedData} />).toBlob();
+        
+        const accessToken = getAccessToken();
+        if (!accessToken) {
+          throw new Error('No hay token de acceso disponible');
+        }
+        
+        const updateResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${finalFileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: finalPdfBlob
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error(`Error al actualizar el certificado: ${updateResponse.statusText}`);
+        }
+        
+        console.log('Certificado de participación con QR actualizado en Drive:', finalUrl);
+        zip.file(finalFileName, finalPdfBlob);
+        
+      } catch (certError) {
+        console.error(`Error al generar certificado de participación para ${data.nombre}:`, certError);
+        alert(`Error al generar certificado para ${data.nombre}: ${certError.message}`);
+      }
+      
+      const currentProgress = Math.round(((i + 1) / totalItems) * 100);
+      setProgress(currentProgress);
+    }
+    
+    // Resto de la lógica igual que generateCertificates...
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = window.URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `certificados_participacion_${new Date().toISOString().split('T')[0]}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert(`Se generaron ${excelData.length} certificados de participación exitosamente`);
+    
+  } catch (error) {
+    console.error('Error general en la generación:', error);
+    alert(`Error en la generación: ${error.message}`);
+  } finally {
+    setIsGenerating(false);
+    setProgress(0);
+  }
+};
 const readExcelFile = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -891,39 +1083,74 @@ const generateCertificates = async () => {
                     {showPreview ? 'Ocultar Vista Previa' : 'Mostrar Vista Previa'}
                   </button>
                   
-                  {excelData.length > 0 && (
-                    <button
-                      onClick={generateCertificates}
-                      disabled={isGenerating}
-                      style={{
-                        backgroundColor: '#059669', 
-                        color: 'white', 
-                        padding: '0.5rem 1rem', 
-                        borderRadius: '0.5rem', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        opacity: isGenerating ? '0.5' : '1',
-                        cursor: isGenerating ? 'not-allowed' : 'pointer'
-                      }}
-                    >
-                      {isGenerating ? (
-                        <>
-                          <svg style={{animation: 'spin 1s linear infinite', marginRight: '0.75rem', height: '1.25rem', width: '1.25rem'}} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle style={{opacity: '0.25'}} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path style={{opacity: '0.75'}} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Generando...
-                        </>
-                      ) : (
-                        <>
-                          <svg style={{width: '1.25rem', height: '1.25rem', marginRight: '0.5rem'}} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                          Generar Certificados
-                        </>
-                      )}
-                    </button>
+         {excelData.length > 0 && (
+                    <>
+                      <button
+                        onClick={generateCertificates}
+                        disabled={isGenerating}
+                        style={{
+                          backgroundColor: '#059669', 
+                          color: 'white', 
+                          padding: '0.5rem 1rem', 
+                          borderRadius: '0.5rem', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          opacity: isGenerating ? '0.5' : '1',
+                          cursor: isGenerating ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <svg style={{animation: 'spin 1s linear infinite', marginRight: '0.75rem', height: '1.25rem', width: '1.25rem'}} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle style={{opacity: '0.25'}} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path style={{opacity: '0.75'}} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Generando...
+                          </>
+                        ) : (
+                          <>
+                            <svg style={{width: '1.25rem', height: '1.25rem', marginRight: '0.5rem'}} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Generar Certificados
+                          </>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={generateParticipationCertificates}
+                        disabled={isGenerating}
+                        style={{
+                          backgroundColor: '#7c3aed', 
+                          color: 'white', 
+                          padding: '0.5rem 1rem', 
+                          borderRadius: '0.5rem', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          opacity: isGenerating ? '0.5' : '1',
+                          cursor: isGenerating ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <svg style={{animation: 'spin 1s linear infinite', marginRight: '0.75rem', height: '1.25rem', width: '1.25rem'}} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle style={{opacity: '0.25'}} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path style={{opacity: '0.75'}} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Generando...
+                          </>
+                        ) : (
+                          <>
+                            <svg style={{width: '1.25rem', height: '1.25rem', marginRight: '0.5rem'}} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Generar Certificados de Participación
+                          </>
+                        )}
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
