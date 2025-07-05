@@ -117,6 +117,13 @@ const styles = StyleSheet.create({
     right: 40,
     alignItems: 'center',
   },
+  footer2: {
+    position: 'absolute',
+    bottom: 15, // Ajustado de 40 a 25
+    left: 40,
+    right: 40,
+    alignItems: 'center',
+  },
   footerImages: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -338,7 +345,7 @@ const Certificate2 = ({ data }) => {
             <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>{"\n"}{"\n"}{"\n"}
           </View>
 
-          <View style={styles.footer}>
+          <View style={styles.footer2}>
             <View style={styles.footerImages}>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.signatureImage} src={firmaImage} />
