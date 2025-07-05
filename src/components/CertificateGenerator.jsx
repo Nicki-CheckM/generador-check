@@ -1277,5 +1277,4 @@ const generateCertificates = async () => {
       </div>
     );
 };
-
 export default CertificateGenerator;
