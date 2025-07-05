@@ -355,136 +355,7 @@ const Certificate2 = ({ data }) => {
   );
 };
 // Nueva función para generar certificados de participación
-const generateParticipationCertificates = async () => {
-  if (!excelData || excelData.length === 0) {
-    alert('No hay datos para generar certificados');
-    return;
-  }
 
-  setIsGenerating(true);
-  setProgress(0);
-  
-  console.log('Iniciando generación de certificados de participación con datos:', excelData);
-  const zip = new JSZip();
-  const totalItems = excelData.length;
-  
-  const updatedExcelData = excelData.map(item => {
-    const { rutSin, clave } = procesarRut(item.rut);
-    return {
-      ...item,
-      'rut sin': rutSin,
-      'clave': clave
-    };
-  });
-
-  try {
-    const mainFolderId = '1zsair15nFgTqRrV8vy96a17InevDH2SK';
-    
-    const today = new Date();
-    const courseName = excelData && excelData.length > 0 ? 
-    excelData[0].nombreCurso.replace(/[^a-z0-9]/gi, '_').substring(0, 30) : '';
-    const folderName = `${today.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).replace(/\//g, '-')}_${courseName}_PARTICIPACION`;
-    
-    let dateFolderId;
-    try {
-      dateFolderId = await createFolderInDrive(folderName, mainFolderId);
-      if (!dateFolderId) {
-        throw new Error('No se pudo crear la carpeta en Drive. Verifica que estés usando la cuenta correcta con los permisos adecuados.');
-      }
-    } catch (folderError) {
-      alert(`Error: ${folderError.message}`);
-      setIsGenerating(false);
-      return;
-    }
-    
-    const targetFolderId = dateFolderId;
-    console.log('Carpeta creada en Drive con ID:', targetFolderId);
-    
-    for (let i = 0; i < excelData.length; i++) {
-      const data = excelData[i];
-      console.log('Generando certificado de participación para:', data);
-      
-      const timestamp = new Date().getTime() + i;
-      const safeCourseName = data.nombreCurso.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const safeName = data.nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-      const finalFileName = `certificado_participacion_${safeCourseName}_${safeName}_${timestamp}.pdf`;
-      
-      try {
-        const placeholderBlob = new Blob(['Placeholder'], { type: 'text/plain' });
-        const placeholderResult = await uploadFileToDrive(placeholderBlob, finalFileName, targetFolderId);
-        
-        if (!placeholderResult || !placeholderResult.url || !placeholderResult.fileId) {
-          throw new Error(`No se pudo crear el placeholder para ${data.nombre}`);
-        }
-        
-        const finalUrl = placeholderResult.url;
-        const finalFileId = placeholderResult.fileId;
-        
-        updatedExcelData[i] = {
-          ...updatedExcelData[i],
-          url_pdf: finalUrl
-        };
-
-        const qrCodeUrl = await generateQRCode(finalUrl);
-        const updatedData = { ...data, qrCodeUrl };
-        
-        // Usar Certificate2 en lugar de Certificate
-        const finalPdfBlob = await pdf(<Certificate2 data={updatedData} />).toBlob();
-        
-        const accessToken = getAccessToken();
-        if (!accessToken) {
-          throw new Error('No hay token de acceso disponible');
-        }
-        
-        const updateResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${finalFileId}?uploadType=media`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          },
-          body: finalPdfBlob
-        });
-        
-        if (!updateResponse.ok) {
-          throw new Error(`Error al actualizar el certificado: ${updateResponse.statusText}`);
-        }
-        
-        console.log('Certificado de participación con QR actualizado en Drive:', finalUrl);
-        zip.file(finalFileName, finalPdfBlob);
-        
-      } catch (certError) {
-        console.error(`Error al generar certificado de participación para ${data.nombre}:`, certError);
-        alert(`Error al generar certificado para ${data.nombre}: ${certError.message}`);
-      }
-      
-      const currentProgress = Math.round(((i + 1) / totalItems) * 100);
-      setProgress(currentProgress);
-    }
-    
-    // Resto de la lógica igual que generateCertificates...
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const url = window.URL.createObjectURL(zipBlob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = `certificados_participacion_${new Date().toISOString().split('T')[0]}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    
-    alert(`Se generaron ${excelData.length} certificados de participación exitosamente`);
-    
-  } catch (error) {
-    console.error('Error general en la generación:', error);
-    alert(`Error en la generación: ${error.message}`);
-  } finally {
-    setIsGenerating(false);
-    setProgress(0);
-  }
-};
 const readExcelFile = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -708,7 +579,136 @@ const procesarRut = (rut) => {
 };
 
 
+const generateParticipationCertificates = async () => {
+  if (!excelData || excelData.length === 0) {
+    alert('No hay datos para generar certificados');
+    return;
+  }
 
+  setIsGenerating(true);
+  setProgress(0);
+  
+  console.log('Iniciando generación de certificados de participación con datos:', excelData);
+  const zip = new JSZip();
+  const totalItems = excelData.length;
+  
+  const updatedExcelData = excelData.map(item => {
+    const { rutSin, clave } = procesarRut(item.rut);
+    return {
+      ...item,
+      'rut sin': rutSin,
+      'clave': clave
+    };
+  });
+
+  try {
+    const mainFolderId = '1zsair15nFgTqRrV8vy96a17InevDH2SK';
+    
+    const today = new Date();
+    const courseName = excelData && excelData.length > 0 ? 
+    excelData[0].nombreCurso.replace(/[^a-z0-9]/gi, '_').substring(0, 30) : '';
+    const folderName = `${today.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }).replace(/\//g, '-')}_${courseName}_PARTICIPACION`;
+    
+    let dateFolderId;
+    try {
+      dateFolderId = await createFolderInDrive(folderName, mainFolderId);
+      if (!dateFolderId) {
+        throw new Error('No se pudo crear la carpeta en Drive. Verifica que estés usando la cuenta correcta con los permisos adecuados.');
+      }
+    } catch (folderError) {
+      alert(`Error: ${folderError.message}`);
+      setIsGenerating(false);
+      return;
+    }
+    
+    const targetFolderId = dateFolderId;
+    console.log('Carpeta creada en Drive con ID:', targetFolderId);
+    
+    for (let i = 0; i < excelData.length; i++) {
+      const data = excelData[i];
+      console.log('Generando certificado de participación para:', data);
+      
+      const timestamp = new Date().getTime() + i;
+      const safeCourseName = data.nombreCurso.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const safeName = data.nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      const finalFileName = `certificado_participacion_${safeCourseName}_${safeName}_${timestamp}.pdf`;
+      
+      try {
+        const placeholderBlob = new Blob(['Placeholder'], { type: 'text/plain' });
+        const placeholderResult = await uploadFileToDrive(placeholderBlob, finalFileName, targetFolderId);
+        
+        if (!placeholderResult || !placeholderResult.url || !placeholderResult.fileId) {
+          throw new Error(`No se pudo crear el placeholder para ${data.nombre}`);
+        }
+        
+        const finalUrl = placeholderResult.url;
+        const finalFileId = placeholderResult.fileId;
+        
+        updatedExcelData[i] = {
+          ...updatedExcelData[i],
+          url_pdf: finalUrl
+        };
+
+        const qrCodeUrl = await generateQRCode(finalUrl);
+        const updatedData = { ...data, qrCodeUrl };
+        
+        // Usar Certificate2 en lugar de Certificate
+        const finalPdfBlob = await pdf(<Certificate2 data={updatedData} />).toBlob();
+        
+        const accessToken = getAccessToken();
+        if (!accessToken) {
+          throw new Error('No hay token de acceso disponible');
+        }
+        
+        const updateResponse = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${finalFileId}?uploadType=media`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: finalPdfBlob
+        });
+        
+        if (!updateResponse.ok) {
+          throw new Error(`Error al actualizar el certificado: ${updateResponse.statusText}`);
+        }
+        
+        console.log('Certificado de participación con QR actualizado en Drive:', finalUrl);
+        zip.file(finalFileName, finalPdfBlob);
+        
+      } catch (certError) {
+        console.error(`Error al generar certificado de participación para ${data.nombre}:`, certError);
+        alert(`Error al generar certificado para ${data.nombre}: ${certError.message}`);
+      }
+      
+      const currentProgress = Math.round(((i + 1) / totalItems) * 100);
+      setProgress(currentProgress);
+    }
+    
+    // Resto de la lógica igual que generateCertificates...
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = window.URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `certificados_participacion_${new Date().toISOString().split('T')[0]}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    alert(`Se generaron ${excelData.length} certificados de participación exitosamente`);
+    
+  } catch (error) {
+    console.error('Error general en la generación:', error);
+    alert(`Error en la generación: ${error.message}`);
+  } finally {
+    setIsGenerating(false);
+    setProgress(0);
+  }
+};
 
 const generateCertificates = async () => {
   if (!excelData || excelData.length === 0) {
