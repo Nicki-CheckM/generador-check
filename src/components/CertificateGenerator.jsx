@@ -339,10 +339,7 @@ const Certificate2 = ({ data }) => {
               así al fortalecimiento de sus conocimientos y competencias en la{"\n"}
               temática abordada.
             </Text>
-          </View>
-
-          <View style={styles.footerContent}>
-            <Text>Santiago de Chile, <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text></Text>{"\n"}{"\n"}{"\n"}
+            <Text>Santiago de Chile, {data.dia} de {data.mes} de {data.año}</Text>
           </View>
 
           <View style={styles.footer2}>
