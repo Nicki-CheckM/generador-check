@@ -427,49 +427,49 @@ const handleGoogleAuth = async () => {
       alert('Error al autenticar con Google Drive');
     }
   };
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    try {
-      const data = await readExcelFile(file);
-      // Limpiar y transformar los datos
-      const transformedData = data.map(item => {
-        // Convertir todas las claves del objeto a minúsculas y sin espacios
-        const normalizedItem = {};
-        Object.keys(item).forEach(key => {
-          const normalizedKey = key.toLowerCase().trim();
-          normalizedItem[normalizedKey] = item[key];
-        });
-
-        // Crear un objeto limpio con las claves correctas
-        const cleanItem = {
-          nombre: normalizedItem['nombre'] || '',
-          rut: normalizedItem['rut'] || '',
-          asistencia: normalizedItem['asistencia'] || 0,
-          nota: normalizedItem['nota'] || '',
-          jornada: normalizedItem['jornada'] || '',
-          tipo_jornada: normalizedItem['tipo_jornada'] || '', // Añadimos el campo tipo_jornada con valor por defecto
-          nombreCurso: normalizedItem['nombrecurso'] || '',
-          horas: normalizedItem['horas'] || '',
-          año: normalizedItem['año'] || new Date().getFullYear().toString(),
-          numeroCertificado: normalizedItem['numerocertificado'] || '',
-          fechaInicio: formatExcelDate(normalizedItem['fechainicio']),
-          fechaFin: formatExcelDate(normalizedItem['fechafin'])
-        };
-
-        console.log('Item original:', item);
-        console.log('Item normalizado:', normalizedItem);
-        console.log('Item limpio:', cleanItem);
-
-        return cleanItem;
+const handleFileUpload = async (event) => {
+  const file = event.target.files[0];
+  try {
+    const data = await readExcelFile(file);
+    // Limpiar y transformar los datos
+    const transformedData = data.map(item => {
+      // Convertir todas las claves del objeto a minúsculas y sin espacios
+      const normalizedItem = {};
+      Object.keys(item).forEach(key => {
+        const normalizedKey = key.toLowerCase().trim();
+        normalizedItem[normalizedKey] = item[key];
       });
 
-      console.log('Datos transformados:', transformedData);
-      setExcelData(transformedData);
-    } catch (error) {
-      console.error('Error al leer el archivo Excel:', error);
-      alert('Error al leer el archivo Excel');
-    }
-  };
+      // Crear un objeto limpio con las claves correctas
+      const cleanItem = {
+        nombre: normalizedItem['nombre'] || '',
+        rut: normalizedItem['rut'] || '',
+        correo: normalizedItem['correo'] || normalizedItem['email'] || '', // Agregar correo
+        asistencia: normalizedItem['asistencia'] || 0,
+        nota: normalizedItem['nota'] || '',
+        jornada: normalizedItem['jornada'] || '',
+        tipo_jornada: normalizedItem['tipo_jornada'] || '',
+        nombreCurso: normalizedItem['nombrecurso'] || '',
+        horas: normalizedItem['horas'] || '',
+        año: normalizedItem['año'] || new Date().getFullYear().toString(),
+        numeroCertificado: normalizedItem['numerocertificado'] || '',
+        fechaInicio: formatExcelDate(normalizedItem['fechainicio']),
+        fechaFin: formatExcelDate(normalizedItem['fechafin']),
+        // Para certificados de participación
+        dia: normalizedItem['dia'] || '',
+        mes: normalizedItem['mes'] || ''
+      };
+
+      return cleanItem;
+    });
+
+    console.log('Datos transformados:', transformedData);
+    setExcelData(transformedData);
+  } catch (error) {
+    console.error('Error al leer el archivo Excel:', error);
+    alert('Error al leer el archivo Excel');
+  }
+};
   
 
   // Función para formatear fechas de Excel
@@ -579,6 +579,7 @@ const procesarRut = (rut) => {
 };
 
 
+// Función completa generateParticipationCertificates
 const generateParticipationCertificates = async () => {
   if (!excelData || excelData.length === 0) {
     alert('No hay datos para generar certificados');
@@ -656,7 +657,6 @@ const generateParticipationCertificates = async () => {
         const qrCodeUrl = await generateQRCode(finalUrl);
         const updatedData = { ...data, qrCodeUrl };
         
-        // Usar Certificate2 en lugar de Certificate
         const finalPdfBlob = await pdf(<Certificate2 data={updatedData} />).toBlob();
         
         const accessToken = getAccessToken();
@@ -688,21 +688,99 @@ const generateParticipationCertificates = async () => {
       setProgress(currentProgress);
     }
     
-    // Resto de la lógica igual que generateCertificates...
-    const zipBlob = await zip.generateAsync({ type: 'blob' });
-    const url = window.URL.createObjectURL(zipBlob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = `certificados_participacion_${new Date().toISOString().split('T')[0]}.zip`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // Crear y descargar el archivo ZIP
+    console.log('Generando archivo ZIP...');
+    const content = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(content);
+    const link = document.createElement('a');
+    link.href = url;
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.download = `certificados_participacion_${timestamp}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     
-    alert(`Se generaron ${excelData.length} certificados de participación exitosamente`);
+    // Generar el Excel actualizado con las URLs
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(updatedExcelData);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Certificados_Participacion");
+    
+    const timestamp2 = new Date().toISOString().split('T')[0];
+    const excelFileName = `certificados_participacion_urls_${timestamp2}.xlsx`;
+    
+    XLSX.writeFile(workbook, excelFileName);
+    
+    // Enviar datos a WordPress (opcional para certificados de participación)
+    try {
+      console.log('Enviando datos de participación a WordPress...');
+  
+      const jwtToken = import.meta.env.VITE_WP_JWT_TOKEN;
+      
+      if (!jwtToken) {
+        console.error('Token JWT no encontrado en variables de entorno');
+        throw new Error('Token JWT de WordPress no configurado en variables de entorno');
+      }
+      
+      console.log('Usando autenticación JWT para certificados de participación');
+      
+      for (let i = 0; i < updatedExcelData.length; i++) {
+        const item = updatedExcelData[i];
+        
+        const randomCode = Math.floor(10000 + Math.random() * 90000);
+        const postTitle = `PARTICIPACION - ${item.nombre} - ${item['rut sin']} - ${item.nombreCurso} #${randomCode}`;
+        
+        const postData = {
+          title: postTitle,
+          status: 'publish',
+          content: `Certificado de Participación para ${item.nombre}`,
+          meta: {
+            rut_estudiante: item['rut sin'],
+            clave_acceso: item.clave,
+            curso_nombre: item.nombreCurso,
+            pdf_url: item.url_pdf,
+            nombre_alumno: item.nombre,
+            ano: item.año || new Date().getFullYear().toString(),
+            tipo_certificado: 'participacion',
+            correo: item.correo || '',
+            dia: item.dia || '',
+            mes: item.mes || ''
+          }
+        };
+        
+        console.log('Enviando datos de participación a WordPress:', postData);
+        
+        const wpResponse = await fetch('https://certificados.checkmedicinemo.com/wp-json/wp/v2/certificados', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${jwtToken}`,
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(postData)
+        });
+        
+        console.log(`Respuesta de WordPress para participación (status ${wpResponse.status}):`, wpResponse);
+        
+        if (!wpResponse.ok) {
+          const errorText = await wpResponse.text();
+          console.error(`Error al enviar certificado de participación ${i+1} a WordPress:`, errorText);
+          continue;
+        }
+            
+        const wpResult = await wpResponse.json();
+        console.log(`Certificado de participación ${i+1} enviado a WordPress con ID:`, wpResult.id);
+      }
+      
+      console.log('Todos los certificados de participación enviados a WordPress');
+      alert('Certificados de participación generados con éxito, Excel actualizado con URLs y datos enviados a WordPress');
+    } catch (wpError) {
+      console.error('Error al enviar datos de participación a WordPress:', wpError);
+      alert('Certificados de participación generados con éxito y Excel actualizado con URLs, pero hubo un error al enviar a WordPress: ' + wpError.message);
+    }
     
   } catch (error) {
-    console.error('Error general en la generación:', error);
+    console.error('Error general en la generación de participación:', error);
     alert(`Error en la generación: ${error.message}`);
   } finally {
     setIsGenerating(false);
