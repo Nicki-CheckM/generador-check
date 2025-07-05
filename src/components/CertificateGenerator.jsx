@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   marginTop: 5,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 5,
   },
   name: {
     fontSize: 30, // 30px como solicitado
