@@ -87,6 +87,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingBottom: 15,
   },
+   falipoo:{
+    marginTop:15
+   },  
   name: {
     fontSize: 30, // 30px como solicitado
   
@@ -335,7 +338,7 @@ const Certificate2 = ({ data }) => {
               Ha participado en calidad de asistente en el taller:{"\n"}
               "<Text style={styles.name2}>{data.nombreCurso}</Text>",{"\n"}
             </Text>
-              <Text>
+              <Text style={styles.falipoo}>
              Realizado el día <Text style={styles.dynamicData}>{data.dia}</Text> de <Text style={styles.dynamicData}>{data.mes}</Text> de <Text style={styles.dynamicData}>{data.año}</Text>{"\n"}
               Este taller fue organizado por Check Medicine Mode On, contribuyendo{"\n"}
               así al fortalecimiento de sus conocimientos y competencias en la{"\n"}
