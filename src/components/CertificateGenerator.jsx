@@ -373,6 +373,15 @@ const Certificate2 = ({ data }) => {
     </Document>
   );
 };
+// Función para asegurar que todos los campos meta sean strings
+const ensureStringFields = (meta) => {
+  const stringMeta = {};
+  Object.keys(meta).forEach(key => {
+    stringMeta[key] = String(meta[key] || '');
+  });
+  return stringMeta;
+};
+
 // Nueva función para generar certificados de participación
 
 const readExcelFile = (file) => {
@@ -470,7 +479,7 @@ const handleFileUpload = async (event) => {
         tipo_jornada: normalizedItem['tipo_jornada'] || '',
         nombreCurso: normalizedItem['nombrecurso'] || '',
         horas: normalizedItem['horas'] || '',
-        año: normalizedItem['año'] || new Date().getFullYear().toString(),
+        año: String(normalizedItem['año'] || new Date().getFullYear()),
         numeroCertificado: normalizedItem['numerocertificado'] || '',
         fechaInicio: formatExcelDate(normalizedItem['fechainicio']),
         fechaFin: formatExcelDate(normalizedItem['fechafin']),
@@ -753,18 +762,18 @@ const generateParticipationCertificates = async () => {
           title: postTitle,
           status: 'publish',
           content: `Certificado de Participación para ${item.nombre}`,
-          meta: {
+          meta: ensureStringFields({
             rut_estudiante: item['rut sin'],
             clave_acceso: item.clave,
             curso_nombre: item.nombreCurso,
             pdf_url: item.url_pdf,
             nombre_alumno: item.nombre,
-            ano: item.año || new Date().getFullYear().toString(),
+            ano: item.año || new Date().getFullYear(),
             tipo_certificado: 'participacion',
-            correo: item.correo || '',
-            dia: item.dia || '',
-            mes: item.mes || ''
-          }
+            correo: item.correo,
+            dia: item.dia,
+            mes: item.mes
+          })
         };
         
         console.log('Enviando datos de participación a WordPress:', postData);
@@ -998,14 +1007,14 @@ const generateCertificates = async () => {
       status: 'publish',
       content: `Certificado para ${item.nombre}`,
       // Formato para JetEngine con campos expuestos en la API REST
-      meta: {
+      meta: ensureStringFields({
         rut_estudiante: item['rut sin'],
         clave_acceso: item.clave,
         curso_nombre: item.nombreCurso,
         pdf_url: item.url_pdf,
         nombre_alumno: item.nombre,
-        ano: item.año || new Date().getFullYear().toString()
-      }
+        ano: item.año || new Date().getFullYear()
+      })
     };
     
     console.log('Enviando datos a WordPress con formato JetEngine (API REST activada):', postData);
