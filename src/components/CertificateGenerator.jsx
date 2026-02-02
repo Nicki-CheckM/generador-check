@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     left: 1,
   },
   footerContent: {
-    fontSize: 10,
+    fontSize: 14,
     textAlign: 'center',
     lineHeight: 1.4, // Reducido
     marginBottom: 15, // Reducido de 30 a 15
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     width: '100%',
-    marginTop: 20,
+    marginTop: 10,
     padding: '0 10px',
   },
   signatureContainer4:{
