@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   },
   footerContent: {
     fontSize: 14,
+    marginTop:20,
     textAlign: 'center',
     lineHeight: 1.4, // Reducido
     marginBottom: 0, // Reducido de 30 a 15
