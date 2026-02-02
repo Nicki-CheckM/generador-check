@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 1.4, // Reducido
-    marginBottom: 15, // Reducido de 30 a 15
+    marginBottom: 0, // Reducido de 30 a 15
   },
   titleContainer: {
     alignItems: 'center',
