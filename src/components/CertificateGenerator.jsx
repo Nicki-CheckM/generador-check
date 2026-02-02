@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     width: '100%',
-    marginTop: 10,
+    marginTop: 0,
     padding: '0 10px',
   },
   signatureContainer4:{
