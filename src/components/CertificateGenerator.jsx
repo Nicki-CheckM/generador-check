@@ -292,7 +292,7 @@ const Certificate = ({ data }) => {
           Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha aprobado con{'\n'}
           nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>", organizada por{'\n'}
           Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text>{'\n'}
-          horas pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio, data.año)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin, data.año)}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
+          horas pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio, data.año)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin, data.año)}</Text>.
           </Text>
         </View>
         <View style={styles.footerContent}>
