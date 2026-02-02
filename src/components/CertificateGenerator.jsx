@@ -241,6 +241,17 @@ const generateQRCode = async (url) => {
   }
 };
 
+const formatDateToDDMMAA = (value) => {
+  if (!value) return '';
+  const dateStr = String(value);
+  // dd/mm/yyyy
+  const ddmmyyyy = dateStr.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
+  if (ddmmyyyy) {
+    return `${ddmmyyyy[1].padStart(2, '0')}/${ddmmyyyy[2].padStart(2, '0')}/${ddmmyyyy[3].slice(-2)}`;
+  }
+  return dateStr;
+};
+
 const Certificate = ({ data }) => {
   return (
     <Document>
@@ -261,7 +272,7 @@ const Certificate = ({ data }) => {
           <View style={styles.titleContainer}>
           <Text style={styles.mainTitle}>CERTIFICADO DE APROBACIÓN</Text>
             <Text style={styles.certTitle}>Certificamos que:</Text>
-            <Text style={styles.name}>{data.nombre}</Text>
+           <Text style={styles.name}>{data.nombre?.toUpperCase()}</Text>
             <Text style={styles.rut}>Rut: {data.rut}</Text>
           </View>
 
@@ -270,7 +281,7 @@ const Certificate = ({ data }) => {
           Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
           aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
           organizado por Check Medicine Mode On, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
-          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{data.fechaInicio}</Text> al <Text style={styles.dynamicData}>{data.fechaFin}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
+          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
           </Text>
         </View>
         <View style={styles.footerContent}>
