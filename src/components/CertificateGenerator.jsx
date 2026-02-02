@@ -116,95 +116,67 @@ const styles = StyleSheet.create({
 
   footer: {
     position: 'absolute',
-    bottom: 25, // Ajustado de 40 a 25
-    left: 40,
-    right: 40,
-    alignItems: 'center',
-  },
-  footer2: {
-    position: 'absolute',
-    bottom: 15, // Ajustado de 40 a 25
-    left: 40,
-    right: 40,
+    bottom: 25,
+    left: 20,
+    right: 20,
     alignItems: 'center',
   },
   footerImages: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
     width: '100%',
-    marginTop: 40,
-    padding: '0 20px',
+    marginTop: 20,
+    padding: '0 10px',
   },
-  signatureContainer4:{  flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-
-  },
-  signatureContainer: {
+  signatureContainer4:{
     flex: 1,
     alignItems: 'center',
-    marginHorizontal: 20,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 5,
   },
-  contentContainer: {
-    padding: 25,
-    width: '100%',
-    height: '100%',
-    position: 'relative',
-    zIndex: 1,
-    backgroundColor: 'transparent', // Aseguramos que este contenedor también sea transparente
-  },
-  
-
   signatureImage: {
-    width: '100%',
-    height: 80,
+    width: 120,
+    height: 60,
     objectFit: 'contain',
-    marginBottom: 10,
-  },
-  sealContainer: {
-    marginTop:-30,
-    alignItems: 'center',
-    marginBottom: 0,
+    marginBottom: 5,
   },
   sealImage: {
-    width: 180,
-    height: 180,
+    width: 110,
+    height: 110,
     objectFit: 'contain',
-    marginBottom: 2,
-  },
-  qrContainer: {
-    position: 'absolute',
-    bottom: 40,
-    right: 40,
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-  },
-  qrImage: {
-    width: 80,
-    height: 80,
-  },
-  qrText: {
-    fontSize: 8,
-
-    textAlign: 'center',
-    marginTop: 5,
-  },
-  websiteText: {
-    fontSize: 10,
-
-    textAlign: 'center',
-    marginTop: -30,
+    marginBottom: 0,
   },
   certificateImage: {
-    width: 130,
-    height: 130,
+    width: 100,
+    height: 100,
     objectFit: 'contain',
   },
   certhiaImage: {
-    width: 130,
-    height: 130,
+    width: 100,
+    height: 100,
     objectFit: 'contain',
+  },
+  qrContainer: {
+    width: 70,
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  qrImage: {
+    width: 70,
+    height: 70,
+  },
+  qrText: {
+    fontSize: 8,
+    textAlign: 'center',
+    marginTop: 5,
+  },
+  footer2: {
+    position: 'absolute',
+    bottom: 15,
+    left: 20,
+    right: 20,
+    alignItems: 'center',
   },
   dynamicData: {
 
