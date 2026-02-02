@@ -299,18 +299,16 @@ const Certificate = ({ data }) => {
             <View style={styles.footerImages}>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.signatureImage} src={firmaImage} />
-             
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.sealImage} src={selloImage} />
-               
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certificateImage} src={certificadoImage} />
               </View>
               <View style={styles.signatureContainer4}>
-                <Image style={styles.certhiaImage} src={certhiaImage} />
-              </View>
+                {data.qrCodeUrl && (
+                  <View style={styles.qrContainer}>
                     <Image src={data.qrCodeUrl} style={styles.qrImage} />
                     <Text style={styles.qrText}>Verificar certificado</Text>
                   </View>
