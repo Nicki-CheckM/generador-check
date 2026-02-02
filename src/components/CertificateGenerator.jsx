@@ -137,18 +137,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   signatureImage: {
+    width: 130,
+    height: 130,
     objectFit: 'contain',
     marginBottom: 5,
   },
   sealImage: {
-    width: 180,
-    height: 180,
+    width: 130,
+    height: 130,
     objectFit: 'contain',
     marginBottom: 2,
   },
   certificateImage: {
-    width: 150,
-    height: 150,
+    width: 130,
+    height: 130,
+    objectFit: 'contain',
+  },
+  certhiaImage: {
+    width: 130,
+    height: 130,
     objectFit: 'contain',
   },
   qrContainer: {
