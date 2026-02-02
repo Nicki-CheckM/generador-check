@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footer2: {
-    top: 15,
     position: 'absolute',
     bottom: 15, // Ajustado de 40 a 25
     left: 40,
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
+    marginTop: 40,
     padding: '0 20px',
   },
   signatureContainer4:{  flex: 1,
