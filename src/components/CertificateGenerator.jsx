@@ -116,67 +116,97 @@ const styles = StyleSheet.create({
 
   footer: {
     position: 'absolute',
-    bottom: 25,
-    left: 20,
-    right: 20,
+    bottom: 25, // Ajustado de 40 a 25
+    left: 40,
+    right: 40,
+    alignItems: 'center',
+  },
+  footer2: {
+    position: 'absolute',
+    bottom: 15, // Ajustado de 40 a 25
+    left: 40,
+    right: 40,
     alignItems: 'center',
   },
   footerImages: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
     width: '100%',
-    marginTop: 20,
-    padding: '0 10px',
+    marginTop: 40,
+    padding: '0 20px',
   },
-  signatureContainer4:{
+  signatureContainer4:{  flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft:5,
+    paddingRight:5
+
+  },
+  signatureContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingHorizontal: 5,
+    marginHorizontal: 20,
   },
+  contentContainer: {
+    padding: 25,
+    width: '100%',
+    height: '100%',
+    position: 'relative',
+    zIndex: 1,
+    backgroundColor: 'transparent', // Aseguramos que este contenedor también sea transparente
+  },
+  
+
   signatureImage: {
-    width: 120,
-    height: 60,
+    width: '100%',
+    height: 80,
     objectFit: 'contain',
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  sealImage: {
-    width: 110,
-    height: 110,
-    objectFit: 'contain',
+  sealContainer: {
+    marginTop:-30,
+    alignItems: 'center',
     marginBottom: 0,
   },
-  certificateImage: {
-    width: 100,
-    height: 100,
+  sealImage: {
+    width: 180,
+    height: 180,
     objectFit: 'contain',
-  },
-  certhiaImage: {
-    width: 100,
-    height: 100,
-    objectFit: 'contain',
+    marginBottom: 2,
   },
   qrContainer: {
-    width: 70,
+    position: 'absolute',
+    bottom: 40,
+    right: 40,
+    width: 80,
+    height: 80,
     alignItems: 'center',
-    marginBottom: 5,
   },
   qrImage: {
-    width: 70,
-    height: 70,
+    width: 80,
+    height: 80,
   },
   qrText: {
     fontSize: 8,
+
     textAlign: 'center',
     marginTop: 5,
   },
-  footer2: {
-    position: 'absolute',
-    bottom: 15,
-    left: 20,
-    right: 20,
-    alignItems: 'center',
+  websiteText: {
+    fontSize: 10,
+
+    textAlign: 'center',
+    marginTop: -30,
+  },
+  certificateImage: {
+    width: 130,
+    height: 130,
+    objectFit: 'contain',
+  },
+  certhiaImage: {
+    width: 130,
+    height: 130,
+    objectFit: 'contain',
   },
   dynamicData: {
 
@@ -256,10 +286,10 @@ const Certificate = ({ data }) => {
 
                 <View style={styles.content}>
           <Text>
-          Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
-          aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
-          organizada por Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
-          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text>.
+          Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha aprobado con{'\n'}
+          nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>", organizada por{'\n'}
+          Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text>{'\n'}
+          horas pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text>.
           </Text>
         </View>
         <View style={styles.footerContent}>
