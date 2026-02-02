@@ -136,8 +136,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   signatureImage: {
-    width: 120,
-    height: 60,
     objectFit: 'contain',
     marginBottom: 5,
   },
@@ -219,14 +217,38 @@ const generateQRCode = async (url) => {
   }
 };
 
-const formatDateToDDMMAA = (value) => {
+const formatDateToDDMMAA = (value, yearContext) => {
   if (!value) return '';
-  const dateStr = String(value);
+  const dateStr = String(value).trim();
   // dd/mm/yyyy
   const ddmmyyyy = dateStr.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/);
   if (ddmmyyyy) {
     return `${ddmmyyyy[1].padStart(2, '0')}/${ddmmyyyy[2].padStart(2, '0')}/${ddmmyyyy[3].slice(-2)}`;
   }
+
+  // Handle "dd de Month" format (e.g., "23 de Septiembre")
+  const textDate = dateStr.match(/^(\d{1,2})\s+de\s+([a-zA-Z]+)(?:\s+de\s+(\d{4}))?$/i);
+  if (textDate) {
+    const day = textDate[1].padStart(2, '0');
+    const monthName = textDate[2].toLowerCase();
+    let year = textDate[3];
+
+    if (!year && yearContext) {
+      year = String(yearContext);
+    }
+
+    const months = {
+      'enero': '01', 'febrero': '02', 'marzo': '03', 'abril': '04',
+      'mayo': '05', 'junio': '06', 'julio': '07', 'agosto': '08',
+      'septiembre': '09', 'setiembre': '09', 'octubre': '10', 'noviembre': '11', 'diciembre': '12'
+    };
+
+    const month = months[monthName];
+    if (month && year) {
+      return `${day}/${month}/${year.slice(-2)}`;
+    }
+  }
+
   return dateStr;
 };
 
@@ -256,10 +278,10 @@ const Certificate = ({ data }) => {
 
                 <View style={styles.content}>
           <Text>
-          Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
-          aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
-          organizada por Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
-          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
+          Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha aprobado con{'\n'}
+          nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>", organizada por{'\n'}
+          Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text>{'\n'}
+          horas pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio, data.año)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin, data.año)}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
           </Text>
         </View>
         <View style={styles.footerContent}>
