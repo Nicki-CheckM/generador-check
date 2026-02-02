@@ -196,8 +196,13 @@ const styles = StyleSheet.create({
     marginTop: -30,
   },
   certificateImage: {
-    width: 150,
-    height: 150,
+    width: 130,
+    height: 130,
+    objectFit: 'contain',
+  },
+  certhiaImage: {
+    width: 130,
+    height: 130,
     objectFit: 'contain',
   },
   dynamicData: {
@@ -280,7 +285,7 @@ const Certificate = ({ data }) => {
           <Text>
           Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
           aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
-          organizado por Check Medicine Mode On, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
+          organizada por Servicios de Capacitación en salud Check Medicine Limitada, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
           pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text>.
           </Text>
         </View>
@@ -303,6 +308,9 @@ const Certificate = ({ data }) => {
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certificateImage} src={certificadoImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
+                <Image style={styles.certhiaImage} src={certhiaImage} />
               </View>
               <View style={styles.signatureContainer4}>
                 {data.qrCodeUrl && (
