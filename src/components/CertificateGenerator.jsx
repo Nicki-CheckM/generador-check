@@ -8,6 +8,7 @@ import selloImage from '../imagenes/sello.png';
 import fondoPdf from '../imagenes/formato-certificado.png';
 import certificadoImage from '../imagenes/certificado.png';
 import firmaImage from '../imagenes/firma.png';
+import certhiaImage from '../imagenes/certhia.png';
 import { getAuthUrl, getTokens, setTokens, uploadFileToDrive, createFolderInDrive, deleteFileFromDrive, getAccessToken } from '../utils/googleDriveService';
 // Importar las fuentes locales
 import barlowRegular from '../assets/font/Barlow-Regular.ttf';
@@ -376,6 +377,9 @@ const Certificate2 = ({ data }) => {
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certificateImage} src={certificadoImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
+                <Image style={styles.certhiaImage} src={certhiaImage} />
               </View>
               <View style={styles.signatureContainer4}>
                 {data.qrCodeUrl && (
