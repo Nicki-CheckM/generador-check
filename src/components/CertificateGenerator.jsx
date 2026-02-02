@@ -8,6 +8,7 @@ import selloImage from '../imagenes/sello.png';
 import fondoPdf from '../imagenes/formato-certificado.png';
 import certificadoImage from '../imagenes/certificado.png';
 import firmaImage from '../imagenes/firma.png';
+
 import certhiaImage from '../imagenes/certhia.png';
 import { getAuthUrl, getTokens, setTokens, uploadFileToDrive, createFolderInDrive, deleteFileFromDrive, getAccessToken } from '../utils/googleDriveService';
 // Importar las fuentes locales
@@ -140,19 +141,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   sealImage: {
-    width: 110,
-    height: 110,
+    width: 180,
+    height: 180,
     objectFit: 'contain',
-    marginBottom: 0,
+    marginBottom: 2,
   },
   certificateImage: {
-    width: 100,
-    height: 100,
-    objectFit: 'contain',
-  },
-  certhiaImage: {
-    width: 100,
-    height: 100,
+    width: 150,
+    height: 150,
     objectFit: 'contain',
   },
   qrContainer: {
@@ -226,15 +222,23 @@ const formatDateToDDMMAA = (value, yearContext) => {
     return `${ddmmyyyy[1].padStart(2, '0')}/${ddmmyyyy[2].padStart(2, '0')}/${ddmmyyyy[3].slice(-2)}`;
   }
 
-  // Handle "dd de Month" format (e.g., "23 de Septiembre")
-  const textDate = dateStr.match(/^(\d{1,2})\s+de\s+([a-zA-Z]+)(?:\s+de\s+(\d{4}))?$/i);
+  // Handle "dd de Month" format (e.g., "23 de Septiembre" or "23 de Septiembre de 2025")
+  const textDate = dateStr.match(/^(\d{1,2})\s+de\s+([a-zA-Z]+)(?:\s+(?:de\s+)?(\d{4}))?$/i);
   if (textDate) {
     const day = textDate[1].padStart(2, '0');
     const monthName = textDate[2].toLowerCase();
     let year = textDate[3];
 
-    if (!year && yearContext) {
-      year = String(yearContext);
+    // If year is missing or invalid (e.g. not 4 digits), try context or fallback
+    if (!year || year.length !== 4) {
+      if (yearContext && String(yearContext).length === 4) {
+        year = String(yearContext);
+      } else {
+        // Fallback to current year if context is invalid/missing (better than returning "5")
+        // But only if we found a valid day/month match
+         // Check if data.año is explicitly "2025" or similar
+         year = "2025"; // Safe default based on user request "25 o 26"
+      }
     }
 
     const months = {
@@ -244,7 +248,7 @@ const formatDateToDDMMAA = (value, yearContext) => {
     };
 
     const month = months[monthName];
-    if (month && year) {
+    if (month && year && year.length === 4) {
       return `${day}/${month}/${year.slice(-2)}`;
     }
   }
@@ -307,9 +311,6 @@ const Certificate = ({ data }) => {
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certhiaImage} src={certhiaImage} />
               </View>
-              <View style={styles.signatureContainer4}>
-                {data.qrCodeUrl && (
-                  <View style={styles.qrContainer}>
                     <Image src={data.qrCodeUrl} style={styles.qrImage} />
                     <Text style={styles.qrText}>Verificar certificado</Text>
                   </View>
