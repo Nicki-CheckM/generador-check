@@ -281,7 +281,7 @@ const Certificate = ({ data }) => {
           Ha participado en calidad de Asistente (<Text style={styles.dynamicData}>{data.asistencia}% de asistencia</Text>) y ha{'\n'}
           aprobado con nota final <Text style={styles.dynamicData}>{data.nota}</Text>, <Text style={styles.dynamicData}>{data.tipo_jornada}</Text> "<Text style={styles.dynamicData}>{data.nombreCurso}</Text>",{'\n'}
           organizado por Check Medicine Mode On, con un total de <Text style={styles.dynamicData}>{data.horas}</Text> horas{'\n'}
-          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text> <Text style={styles.dynamicData}>{data.año}</Text>.
+          pedagógicas, realizado desde el <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaInicio)}</Text> al <Text style={styles.dynamicData}>{formatDateToDDMMAA(data.fechaFin)}</Text>.
           </Text>
         </View>
         <View style={styles.footerContent}>
