@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footer2: {
+    top: 15,
     position: 'absolute',
     bottom: 15, // Ajustado de 40 a 25
     left: 40,
