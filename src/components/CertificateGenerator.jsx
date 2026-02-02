@@ -117,6 +117,7 @@ const styles = StyleSheet.create({
 
   footer: {
     position: 'absolute',
+    marginTop: -15,
     bottom: 25,
     left: 20,
     right: 20,
