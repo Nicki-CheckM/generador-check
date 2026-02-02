@@ -307,6 +307,9 @@ const Certificate = ({ data }) => {
                 <Image style={styles.certificateImage} src={certificadoImage} />
               </View>
               <View style={styles.signatureContainer4}>
+                <Image style={styles.certhiaImage} src={certhiaImage} />
+              </View>
+              <View style={styles.signatureContainer4}>
                 {data.qrCodeUrl && (
                   <View style={styles.qrContainer}>
                     <Image src={data.qrCodeUrl} style={styles.qrImage} />
