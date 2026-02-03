@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     height: 70,
   },
   qrText: {
-    fontSize: 8,
+    fontSize: 6,
     textAlign: 'center',
     marginTop: 5,
   },
