@@ -9,6 +9,7 @@ import fondoPdf from '../imagenes/formato-certificado.png';
 import certificadoImage from '../imagenes/certificado.png';
 import firmaImage from '../imagenes/firma.png';
 
+import sis from '../imagenes/sssss.png';
 import certhiaImage from '../imagenes/certhia.png';
 import { getAuthUrl, getTokens, setTokens, uploadFileToDrive, createFolderInDrive, deleteFileFromDrive, getAccessToken } from '../utils/googleDriveService';
 // Importar las fuentes locales
@@ -313,7 +314,7 @@ const Certificate = ({ data }) => {
                 <Image style={styles.sealImage} src={selloImage} />
               </View>
               <View style={styles.signatureContainer4}>
-                <Image style={styles.certificateImage} src={certificadoImage} />
+                <Image style={styles.certificateImage} src={sis} />
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certhiaImage} src={certhiaImage} />
