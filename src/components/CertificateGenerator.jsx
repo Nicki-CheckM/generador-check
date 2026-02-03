@@ -244,10 +244,8 @@ const formatDateToDDMMAA = (value, yearContext) => {
       if (yearContext && String(yearContext).length === 4) {
         year = String(yearContext);
       } else {
-        // Fallback to current year if context is invalid/missing (better than returning "5")
-        // But only if we found a valid day/month match
-         // Check if data.año is explicitly "2025" or similar
-         year = "2025"; // Safe default based on user request "25 o 26"
+        // Fallback to current year if context is invalid/missing
+        year = new Date().getFullYear().toString();
       }
     }
 
@@ -382,7 +380,7 @@ const Certificate2 = ({ data }) => {
                 <Image style={styles.sealImage} src={selloImage} />
               </View>
               <View style={styles.signatureContainer4}>
-                <Image style={styles.certificateImage} src={certificadoImage} />
+                <Image style={styles.certificateImage} src={sis} />
               </View>
               <View style={styles.signatureContainer4}>
                 <Image style={styles.certhiaImage} src={certhiaImage} />
